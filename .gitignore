@@ -1,0 +1,30 @@
+# Build / firmware
+firmware/v1.0_esp32_fdc1004/build/
+firmware/**/build/
+firmware/**/sdkconfig
+firmware/**/sdkconfig.old
+firmware/**/*.elf
+firmware/**/*.bin
+firmware/**/*.map
+
+# KiCad
+hardware/*/pcb/*.bak
+hardware/*/pcb/*.sch-bak
+hardware/*/pcb/*.kicad_pcb-bak
+hardware/*/pcb/*.kicad_sch-bak
+hardware/*/cad/*.step
+hardware/*/cad/*.stp
+hardware/*/cad/*.iges
+hardware/*/cad/*.igs
+hardware/*/cad/*.brep
+hardware/*/cad/*.sat
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*.tmp
+
+# IDE / misc
+*.log
