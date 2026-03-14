@@ -10,14 +10,22 @@ firmware/**/*.map
 # KiCad
 hardware/*/pcb/*.bak
 hardware/*/pcb/*.sch-bak
-hardware/*/pcb/*.kicad_pcb-bak
-hardware/*/pcb/*.kicad_sch-bak
 hardware/*/cad/*.step
 hardware/*/cad/*.stp
 hardware/*/cad/*.iges
 hardware/*/cad/*.igs
 hardware/*/cad/*.brep
 hardware/*/cad/*.sat
+hardware/*/pcb/*.bak
+hardware/*/pcb/*.sch-bak
+*.kicad_pcb-bak
+*.kicad_sch-bak
+*.kicad_sch-backup*
+*.kicad_pcb-backup*
+fp-info-cache
+__pycache__/
+#auto_saved_files#
+*-backups/
 
 # OS / editor
 .DS_Store
