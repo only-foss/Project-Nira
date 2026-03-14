@@ -1,13 +1,14 @@
+ 
 /**
  * NIRA v2.0 - Micro-plastic Detection Capacitive Flow Sensor
  * ESP32 + ProtoCentral FDC1004 (C1 + C2 near-simultaneous sampling)
- * 
+ *
  * Features:
  * • 100 Hz sampling rate
  * • CIN1 (C1) and CIN2 (C2) measured back-to-back (<500 µs apart)
  * • Common GND plate for both channels
  * • CSV output: time_ms, CH1_raw, CH2_raw, delta_us
- * 
+ *
  * License: MIT
  * Hardware license reference: CERN OHL-S v2 (for associated KiCad files)
  */
