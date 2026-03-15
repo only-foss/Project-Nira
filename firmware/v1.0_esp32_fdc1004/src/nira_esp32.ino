@@ -1,6 +1,6 @@
 
 /**
- * NIRA v1.0.2 - Micro-plastic Detection Capacitive Flow Sensor
+ * NIRA v1.0.3 - Micro-plastic Detection Capacitive Flow Sensor
  * ESP32 + ProtoCentral FDC1004 (C1 + C4 near-simultaneous sampling)
  *
  * Features:
