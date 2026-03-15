@@ -33,8 +33,8 @@ FDC1004 fdc_sensor(&Wire, FDC1004_RATE_100HZ);
 
 // ============================================================================
 // WIFI + INFLUXDB CLOUD CONFIG
-const char* WIFI_SSID         = "YOUR_WIFI_NAME";
-const char* WIFI_PASS         = "YOUR_WIFI_PASSWORD";
+const char* WIFI_SSID         = "MI";
+const char* WIFI_PASS         = "wasd1234";
 
 // InfluxDB Cloud (free tier)
 #define INFLUXDB_URL          "https://us-east-1-1.aws.cloud2.influxdata.com"
@@ -51,19 +51,6 @@ Point sensorData("nira_sensor");
 // GLOBALS
 static uint32_t lastUpload    = 0;
 static uint32_t lastWiFiCheck = 0;
-
-
-// Tme sync Function
-void timeSync(const char* timezone, const char* ntp1, const char* ntp2) {
-  configTime(0, 0, ntp1, ntp2);
-  Serial.print("NTP sync: ");
-  time_t now = time(nullptr);
-  while (now < 8 * 3600 * 2) {
-    delay(500); Serial.print("."); now = time(nullptr);
-  }
-  Serial.println("OK");
-}
-
 
 // ============================================================================
 // SETUP
@@ -126,7 +113,7 @@ void loop() {
 
     float diff = (float)ch1_raw - ch4_raw;
 
-    // Serial Plotter output (unchanged)
+    // Serial Plotter output
     Serial.print(now);
     Serial.print(',');
     Serial.print(ch1_raw);
