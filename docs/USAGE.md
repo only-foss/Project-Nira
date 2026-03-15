@@ -1,15 +1,24 @@
-# Usage Guide
 
-## Serial Plotter
-- Open Tools → Serial Plotter
-- Live lines: CH1_raw, CH4_raw, Diff_C1_C4 (spikes = microplastics)
+# Usage Guide for Project-Nira
 
-## Grafana Dashboard
-- Real-time graphs with zoom, alerts, and export
-- Diff_C1_C4 panel recommended as primary detection metric
+This guide details the setup and operation of the Project-Nira micro-plastic detection system.
 
-## Testing
-1. Connect flow cell to water source
-2. Start flow
-3. Add known microplastic sample
-4. Observe spike in Diff_C1_C4 on both Serial Plotter and Grafana
+### Hardware Setup
+1.  **Sensor Placement:** Position your differential capacitance sensors (C1 and C2) along the water flow path.
+2.  **FDC1004 Connection:** Connect the sensors to the ProtoCentral FDC1004 inputs.
+3.  **Microcontroller Wiring:** Connect the FDC1004 to the **ESP32** via the I2C interface:
+    *   **SCL** -> ESP32 GPIO 22 (default)
+    *   **SDA** -> ESP32 GPIO 21 (default)
+    *   **VCC/GND** -> 3.3V power source.
+
+### Software Configuration
+1.  **Firmware:** Open the project firmware in the Arduino IDE or VS Code (PlatformIO).
+2.  **Environment Variables:** Update the following in your configuration file:
+    *   `WIFI_SSID` / `WIFI_PASSWORD`
+    *   `INFLUXDB_URL`, `TOKEN`, `ORG`, and `BUCKET`.
+3.  **Upload:** Flash the code to the ESP32.
+
+### Operation
+1.  **Baseline Calibration:** Run clean water through the sensor to establish a baseline capacitance reading.
+2.  **Real-Time Monitoring:** As water flows, monitor your **InfluxDB dashboard**. Spikes in the differential capacitance values indicate the passage of micro-plastic particles.
+3.  **Data Analysis:** Use the logged data to calculate the concentration of particles over time.
