@@ -1,7 +1,0 @@
-"#","Reference","Qty","Value","Footprint","DNP"
-"1","C1","1","C_Trim_Differential","",""
-"2","D1","1","LED","LED_THT:LED_D3.0mm_Clear",""
-"3","R1","1","R","",""
-"4","U1","1","PC_FDC1004","",""
-"5","U2","1","DEVKIT_V1_ESP32-WROOM-32","DEVKIT_V1_ESP32-WROOM-32:MODULE_DEVKIT_V1_ESP32-WROOM-32",""
-"6","V1","1","3.3V","",""
