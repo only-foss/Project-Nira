@@ -22,6 +22,8 @@ hardware/*/pcb/*.sch-bak
 *.kicad_sch-bak
 *.kicad_sch-backup*
 *.kicad_pcb-backup*
+*.kicad_pcb.lck
+*.kicad_sch.lck
 fp-info-cache
 __pycache__/
 #auto_saved_files#

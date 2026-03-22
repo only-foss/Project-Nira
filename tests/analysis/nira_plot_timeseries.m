@@ -1,11 +1,35 @@
 % =============================================================
-% nira_plot_timeseries.m
-% Time-series plot: ch1, ch4, and diff for both test conditions
-% Project Nira - https://github.com/only-foss/Project-Nira
+% Project Nira — Open Hardware Microplastics Detector
+% File:    nira_plot_timeseries.m
+% Purpose: Time-series plot of CH1, CH4, and diff_c1_c4 for
+%          both test conditions (clean water vs microplastics)
+%
+% SPDX-License-Identifier: GPL-3.0-or-later
+% Copyright (C) 2026  only-foss
+% Repository: https://github.com/only-foss/Project-Nira
+% Hardware licensed under CERN-OHL-P v2
+% <https://cern-ohl.web.cern.ch/>
 % =============================================================
 
 function nira_plot_timeseries(clean_ch1, clean_ch4, clean_diff, ...
-                               micro_ch1, micro_ch4, micro_diff)
+                               micro_ch1, micro_ch4, micro_diff, results_dir)
+  % NIRA_PLOT_TIMESERIES  Three-panel time-series plot.
+  %
+  %   nira_plot_timeseries(CLEAN_CH1, CLEAN_CH4, CLEAN_DIFF,
+  %                        MICRO_CH1, MICRO_CH4, MICRO_DIFF,
+  %                        RESULTS_DIR)
+  %
+  %   Inputs:
+  %     CLEAN_CH1   — CH1 raw ADC values, clean water (Nx1)
+  %     CLEAN_CH4   — CH4 raw ADC values, clean water (Nx1)
+  %     CLEAN_DIFF  — diff_c1_c4 values, clean water (Nx1)
+  %     MICRO_CH1   — CH1 raw ADC values, microplastics (Mx1)
+  %     MICRO_CH4   — CH4 raw ADC values, microplastics (Mx1)
+  %     MICRO_DIFF  — diff_c1_c4 values, microplastics (Mx1)
+  %     RESULTS_DIR — output directory path (string)
+  %
+  %   Output:
+  %     <RESULTS_DIR>/nira_01_timeseries.png
 
   fig = figure('Position', [100 100 1100 750], 'Visible', 'off');
   t_c = (1:length(clean_ch1))';
@@ -33,7 +57,6 @@ function nira_plot_timeseries(clean_ch1, clean_ch4, clean_diff, ...
   subplot(3, 1, 3);
   plot(t_c, clean_diff, 'b-^', 'MarkerSize', 3, 'LineWidth', 1.4); hold on;
   plot(t_m, micro_diff, 'r-^', 'MarkerSize', 3, 'LineWidth', 1.4);
-  % zero reference line
   xl = [1, max(length(clean_diff), length(micro_diff))];
   plot(xl, [0 0], 'k--', 'LineWidth', 1);
   legend('Clean Water', 'Microplastics', 'Zero', 'Location', 'northeast');
@@ -42,14 +65,14 @@ function nira_plot_timeseries(clean_ch1, clean_ch4, clean_diff, ...
   title('Differential Signal: CH1 - CH4  (Key Detection Feature)');
   grid on;
 
-  % Main title via annotation (sgtitle needs Octave >= 8; use this instead)
   axes('Position', [0 0 1 1], 'Visible', 'off');
   text(0.5, 0.99, 'Project Nira - Sensor Time Series', ...
        'HorizontalAlignment', 'center', 'VerticalAlignment', 'top', ...
        'FontSize', 13, 'FontWeight', 'bold');
 
-  print(fig, 'nira_01_timeseries.png', '-dpng', '-r150');
+  out = fullfile(results_dir, 'nira_01_timeseries.png');
+  print(fig, out, '-dpng', '-r150');
   close(fig);
-  printf('  Saved: nira_01_timeseries.png\n');
+  printf('  Saved: %s\n', out);
 
 end

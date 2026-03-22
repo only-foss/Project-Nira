@@ -1,0 +1,27 @@
+cff-version: 1.2.0
+title: "Project Nira: Open Hardware Microplastics Detector"
+message: "If you use this hardware, firmware, or analysis in your work, please cite it as below."
+type: software
+authors:
+  - name: "only-foss"
+    alias: "only-foss"
+    website: "https://github.com/only-foss"
+repository-code: "https://github.com/only-foss/Project-Nira"
+url: "https://github.com/only-foss/Project-Nira"
+abstract: >
+  Project Nira is an open-source hardware sensor for detecting microplastics
+  in water using capacitance-based differential sensing (FDC1004 + ESP32).
+  The v1.0 prototype demonstrates statistically significant separation between
+  clean water and microplastic-contaminated water (p < 0.001, shift = 571 ADC units).
+keywords:
+  - microplastics
+  - water quality
+  - open hardware
+  - capacitance sensing
+  - ESP32
+  - FDC1004
+  - environmental monitoring
+  - OSHW
+license: CERN-OHL-P-2.0
+version: "1.0"
+date-released: "2026-03-22"

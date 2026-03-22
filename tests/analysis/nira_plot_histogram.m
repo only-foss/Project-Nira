@@ -1,10 +1,31 @@
 % =============================================================
-% nira_plot_histogram.m
-% Overlapping histograms of diff_c1_c4 + Gaussian fits
-% Project Nira - https://github.com/only-foss/Project-Nira
+% Project Nira — Open Hardware Microplastics Detector
+% File:    nira_plot_histogram.m
+% Purpose: Overlapping probability-density histograms of
+%          diff_c1_c4 with Gaussian fits and detection threshold.
+%          Uses patch polygons for FaceAlpha compatibility
+%          across all GNU Octave versions (no extra packages).
+%
+% SPDX-License-Identifier: GPL-3.0-or-later
+% Copyright (C) 2026  only-foss
+% Repository: https://github.com/only-foss/Project-Nira
+% Hardware licensed under CERN-OHL-P v2
+% <https://cern-ohl.web.cern.ch/>
 % =============================================================
 
-function nira_plot_histogram(clean_diff, micro_diff, threshold)
+function nira_plot_histogram(clean_diff, micro_diff, threshold, results_dir)
+  % NIRA_PLOT_HISTOGRAM  Overlapping histograms + Gaussian fits.
+  %
+  %   nira_plot_histogram(CLEAN_DIFF, MICRO_DIFF, THRESHOLD, RESULTS_DIR)
+  %
+  %   Inputs:
+  %     CLEAN_DIFF  — diff_c1_c4 values, clean water (Nx1)
+  %     MICRO_DIFF  — diff_c1_c4 values, microplastics (Mx1)
+  %     THRESHOLD   — detection threshold scalar (ADC units)
+  %     RESULTS_DIR — output directory path (string)
+  %
+  %   Output:
+  %     <RESULTS_DIR>/nira_03_histogram.png
 
   fig = figure('Position', [100 100 800 480], 'Visible', 'off');
 
@@ -12,26 +33,15 @@ function nira_plot_histogram(clean_diff, micro_diff, threshold)
   edges    = linspace(min(all_vals) - 50, max(all_vals) + 50, 30);
   bin_w    = edges(2) - edges(1);
 
-  % Normalised histograms using patch for colour + alpha
+  % Normalised histograms built as patch polygons
+  % (avoids bar() FaceAlpha issues on older Octave versions)
   h1 = histc(clean_diff, edges);
   h2 = histc(micro_diff, edges);
   h1 = h1 / (sum(h1) * bin_w);
   h2 = h2 / (sum(h2) * bin_w);
 
-  % Build staircase polygons for filled transparent bars
-  function [px, py] = bar_poly(edges, heights)
-    n  = length(edges);
-    px = zeros(1, 4*(n-1));
-    py = zeros(1, 4*(n-1));
-    for k = 1:n-1
-      idx      = (k-1)*4 + (1:4);
-      px(idx)  = [edges(k) edges(k+1) edges(k+1) edges(k)];
-      py(idx)  = [0        0          heights(k)  heights(k)];
-    end
-  end
-
-  [px1, py1] = bar_poly(edges, h1);
-  [px2, py2] = bar_poly(edges, h2);
+  [px1, py1] = nira_bar_poly(edges, h1);
+  [px2, py2] = nira_bar_poly(edges, h2);
 
   patch(px1, py1, [0.2 0.5 0.9], 'FaceAlpha', 0.55, 'EdgeColor', 'none');
   hold on;
@@ -47,11 +57,11 @@ function nira_plot_histogram(clean_diff, micro_diff, threshold)
   plot(x_fit, gauss_c, 'b-', 'LineWidth', 2);
   plot(x_fit, gauss_m, 'r-', 'LineWidth', 2);
 
-  % Vertical reference lines via plot
+  % Vertical reference lines (threshold + means)
   yl = [0, max([h1; h2; gauss_c'; gauss_m']) * 1.15];
-  plot([threshold threshold], yl, 'g--', 'LineWidth', 2);
-  plot([mu_c mu_c],           yl * 0.85, 'b:', 'LineWidth', 1.5);
-  plot([mu_m mu_m],           yl * 0.85, 'r:', 'LineWidth', 1.5);
+  plot([threshold threshold], yl,        'g--', 'LineWidth', 2);
+  plot([mu_c mu_c],           yl * 0.85, 'b:',  'LineWidth', 1.5);
+  plot([mu_m mu_m],           yl * 0.85, 'r:',  'LineWidth', 1.5);
   text(threshold + 5, yl(2) * 0.95, sprintf('Thr=%.0f', threshold), ...
        'Color', [0 0.6 0], 'FontSize', 8);
   text(mu_c + 5, yl(2) * 0.78, sprintf('mu=%.0f', mu_c), ...
@@ -68,8 +78,23 @@ function nira_plot_histogram(clean_diff, micro_diff, threshold)
         'FontSize', 12, 'FontWeight', 'bold');
   grid on;
 
-  print(fig, 'nira_03_histogram.png', '-dpng', '-r150');
+  out = fullfile(results_dir, 'nira_03_histogram.png');
+  print(fig, out, '-dpng', '-r150');
   close(fig);
-  printf('  Saved: nira_03_histogram.png\n');
+  printf('  Saved: %s\n', out);
 
+end
+
+% ------------------------------------------------------------------
+function [px, py] = nira_bar_poly(edges, heights)
+  % NIRA_BAR_POLY  Build staircase polygon vertices for a histogram.
+  %   Returns PX, PY suitable for patch() from bin EDGES and HEIGHTS.
+  n  = length(edges);
+  px = zeros(1, 4*(n-1));
+  py = zeros(1, 4*(n-1));
+  for k = 1:n-1
+    idx     = (k-1)*4 + (1:4);
+    px(idx) = [edges(k) edges(k+1) edges(k+1) edges(k)];
+    py(idx) = [0        0          heights(k)  heights(k)];
+  end
 end
