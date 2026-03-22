@@ -193,14 +193,17 @@ The firmware samples FDC1004 channels CH1 and CH4 at 10-second intervals, comput
 Detection threshold: `diff_c1_c4 > 92 ADC units` → microplastics present.
 
 ### Plots
+**nira_01 — Time Series: CH1, CH4, and differential signal**
+![Time Series](tests/results/nira_01_timeseries.png)
 
-| Plot | Description |
-|------|-------------|
-| ![timeseries](tests/results/nira_01_timeseries.png) | CH1, CH4, and diff over time |
-| ![comparison](tests/results/nira_02_comparison.png) | Mean ± σ bar chart + box plot |
-| ![histogram](tests/results/nira_03_histogram.png) | Distribution + Gaussian fits + threshold |
-| ![scatter](tests/results/nira_04_scatter.png) | CH1 vs CH4 scatter — directional shift |
+**nira_02 — Mean ± σ bar chart + box plot**
+![Comparison](tests/results/nira_02_comparison.png)
 
+**nira_03 — Distribution + Gaussian fits + detection threshold**
+![Histogram](tests/results/nira_03_histogram.png)
+
+**nira_04 — CH1 vs CH4 scatter — directional shift**
+![Scatter](tests/results/nira_04_scatter.png)
 ---
 
 ## Analysis
