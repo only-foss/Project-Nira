@@ -43,3 +43,4 @@ Thumbs.db
 #temp file
 
 temp/
+**/fp-info-cache
