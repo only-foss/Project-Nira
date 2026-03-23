@@ -43,7 +43,4 @@ Thumbs.db
 #temp file
 
 temp/
-<<<<<<< HEAD
 **/fp-info-cache
-=======
->>>>>>> c642f05 (chore: remove temp/files.zip from tracking, add temp/ to .gitignore)
