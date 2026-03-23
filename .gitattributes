@@ -1,2 +1,6 @@
-*.m   linguist-language=Octave
-*.ino linguist-language=Arduino
+*.m    linguist-language=Octave
+*.ino  linguist-language=Arduino
+*.kicad_sch  linguist-detectable=false
+*.kicad_pcb  linguist-detectable=false
+*.kicad_pro  linguist-detectable=false
+*.kicad_sym  linguist-detectable=false
