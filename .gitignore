@@ -8,6 +8,7 @@ firmware/**/*.bin
 firmware/**/*.map
 
 # KiCad
+hardware/**/backups/
 hardware/*/pcb/*.bak
 hardware/*/pcb/*.sch-bak
 hardware/*/cad/*.step
