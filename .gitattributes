@@ -1,18 +1,24 @@
+# Analysis scripts — force Octave detection
 *.m linguist-language=Octave
 *.m linguist-detectable=true
+
+# Firmware — force Arduino detection  
 *.ino linguist-language=Arduino
 *.ino linguist-detectable=true
-*.kicad_sch linguist-vendored
-*.kicad_pcb linguist-vendored
-*.kicad_pro linguist-vendored
-*.kicad_prl linguist-vendored
-*.kicad_sym linguist-vendored
-*.csv linguist-vendored
-*.xml linguist-vendored
-*.pdf linguist-vendored
-*.svg linguist-vendored
-*.png linguist-vendored
-*.jpg linguist-vendored
-*.jpeg linguist-vendored
-*.step linguist-vendored
-*.zip linguist-vendored
+
+# Hardware — make KiCad files detectable
+*.kicad_sch linguist-language=KiCad
+*.kicad_sch linguist-detectable=true
+*.kicad_pcb linguist-language=KiCad
+*.kicad_pcb linguist-detectable=true
+*.kicad_sym linguist-language=KiCad
+*.kicad_sym linguist-detectable=true
+
+# Hide truly non-code files only
+*.pdf linguist-vendored=true
+*.zip linguist-vendored=true
+*.png linguist-vendored=true
+*.jpg linguist-vendored=true
+*.jpeg linguist-vendored=true
+*.step linguist-vendored=true
+*.csv linguist-vendored=true
