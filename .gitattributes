@@ -1,17 +1,24 @@
-# Force GNU Octave language detection
+# Force GNU Octave — override Linguist misdetection
 *.m linguist-language=Octave
+*.m linguist-detectable=true
 
-# Force Arduino language detection  
+# Arduino firmware
 *.ino linguist-language=Arduino
+*.ino linguist-detectable=true
 
-# Hide KiCad files from language stats
+# Hide everything else from language stats
 *.kicad_sch linguist-detectable=false
 *.kicad_pcb linguist-detectable=false
 *.kicad_pro linguist-detectable=false
 *.kicad_prl linguist-detectable=false
 *.kicad_sym linguist-detectable=false
 *.kicad_mod linguist-detectable=false
-
-# Hide data files from language stats
 *.csv linguist-detectable=false
 *.xml linguist-detectable=false
+*.pdf linguist-detectable=false
+*.svg linguist-detectable=false
+*.step linguist-detectable=false
+*.zip linguist-detectable=false
+*.png linguist-detectable=false
+*.jpg linguist-detectable=false
+*.jpeg linguist-detectable=false
