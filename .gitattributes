@@ -1,6 +1,17 @@
-*.m    linguist-language=Octave
-*.ino  linguist-language=Arduino
-*.kicad_sch  linguist-detectable=false
-*.kicad_pcb  linguist-detectable=false
-*.kicad_pro  linguist-detectable=false
-*.kicad_sym  linguist-detectable=false
+# Force GNU Octave language detection
+*.m linguist-language=Octave
+
+# Force Arduino language detection  
+*.ino linguist-language=Arduino
+
+# Hide KiCad files from language stats
+*.kicad_sch linguist-detectable=false
+*.kicad_pcb linguist-detectable=false
+*.kicad_pro linguist-detectable=false
+*.kicad_prl linguist-detectable=false
+*.kicad_sym linguist-detectable=false
+*.kicad_mod linguist-detectable=false
+
+# Hide data files from language stats
+*.csv linguist-detectable=false
+*.xml linguist-detectable=false
