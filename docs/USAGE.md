@@ -20,5 +20,5 @@ This guide details the setup and operation of the Project-Nira micro-plastic det
 
 ### Operation
 1.  **Baseline Calibration:** Run clean water through the sensor to establish a baseline capacitance reading.
-2.  **Real-Time Monitoring:** As water flows, monitor your **InfluxDB dashboard**. Spikes in the differential capacitance values indicate the passage of micro-plastic particles.
+2.  **Real-Time Monitoring:** As water flows, monitor your **InfluxDB dashboard**.
 3.  **Data Analysis:** Use the logged data to calculate the concentration of particles over time.

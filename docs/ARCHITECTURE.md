@@ -43,7 +43,7 @@ Water Sample
 | Microcontroller | ESP32 DevKit v1 | I2C master, WiFi, data logging |
 | Communication | WiFi 802.11 b/g/n | Transmit readings to InfluxDB |
 | Storage | InfluxDB (time-series DB) | Store and query sensor data |
-| Visualisation | Grafana | Real-time dashboard |
+| Visualisation | InfluxDB | Real-time dashboard |
 
 ### Why FDC1004?
 
@@ -52,7 +52,6 @@ The Texas Instruments FDC1004 was chosen for v1.0 because:
 - 16-bit resolution, ±15pF range
 - I2C interface — easy to wire to ESP32
 - Low cost, available on ProtoCentral breakout board
-- Fixed I2C address `0x50` — no address conflicts
 - Differential measurement between channels eliminates common-mode noise
 
 ### Why differential sensing (CH1 − CH4)?
