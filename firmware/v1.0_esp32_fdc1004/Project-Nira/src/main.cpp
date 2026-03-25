@@ -1,4 +1,3 @@
-
 /**
  * NIRA v1.0.3 - Micro-plastic Detection Capacitive Flow Sensor
  * ESP32 + ProtoCentral FDC1004 (C1 + C4 near-simultaneous sampling)
@@ -13,6 +12,7 @@
  * Hardware license: CERN OHL-S v2
  */
 
+#include <Arduino.h>
 #include <Wire.h>
 #include <Protocentral_FDC1004.h>
 #include <WiFiMulti.h>
@@ -51,6 +51,14 @@ Point sensorData("nira_sensor");
 // GLOBALS
 static uint32_t lastUpload    = 0;
 static uint32_t lastWiFiCheck = 0;
+
+// ============================================================================
+// HELPER FUNCTION 
+void print_banner();
+bool init_sensor();
+uint16_t read_channel(uint8_t ch);
+void print_wiring_error();
+void send_to_influxdb(uint16_t ch1, uint16_t ch4, float diff);
 
 // ============================================================================
 // SETUP
