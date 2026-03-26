@@ -37,6 +37,9 @@ Thumbs.db
 *.swo
 *.tmp
 
+#draw.io
+*.bkp
+
 # IDE / misc
 *.log
 
