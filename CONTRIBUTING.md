@@ -43,7 +43,7 @@ Thank you for your interest in Project Nira. All contributions — hardware, fir
 
 | Type | Format | Example |
 |------|--------|---------|
-| Feature | `feat/description` | `feat/pcb-v2-layout` |
+| Feature | `feature/description` | `feature/pcb-v2-layout` |
 | Bug fix | `fix/description` | `fix/fdc1004-i2c-timeout` |
 | Documentation | `docs/description` | `docs/hindi-translation` |
 | Hardware | `hw/description` | `hw/enclosure-v1` |
