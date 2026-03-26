@@ -19,9 +19,9 @@
 
 **Affordable (₹2,500) · Portable · Field-deployable · Fully open-source**
 
-*Detect microplastics in water without a ₹10L spectrometer.*
+*Aiming to Detect microplastics in water without a ₹10L spectrometer.*
 
-[Quick Start](#quick-start) · [Hardware](#hardware) · [Firmware](#firmware) · [Test Results](#test-results) · [Analysis](#analysis) · [Contributing](#contributing) · [License](#license)
+[Quick Start](#quick-start) · [Hardware](#hardware) · [Firmware](#firmware) · [Test Results](#test-results) · [Analysis](#analysis) · [Roadmap](#roadmap)· [Contributing](#contributing) · [License](#license)
 
 </div>
 
