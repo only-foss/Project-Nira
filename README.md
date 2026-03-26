@@ -17,7 +17,7 @@
 [![Status](https://img.shields.io/badge/Status-v1.0%20Validated-success?style=flat-square)]()
 [![Made with](https://img.shields.io/badge/Made%20with-GNU%20Octave-orange?style=flat-square)](https://octave.org/)
 
-**Affordable (₹2,500) · Portable · Field-deployable · Fully open-source**
+**Affordable (₹2,500) · Portable · Expeimental · Fully open-source**
 
 *Detect microplastics in water without a ₹10L spectrometer.*
 
