@@ -70,9 +70,11 @@ Project-Nira/
 │   ├── USAGE.md                     # Usage instructions
 │   └── Project-Nira_Open_Micro-plastic_Sensing.pdf
 ├── firmware/
-│   └── v1.0_esp32_fdc1004/
-│       └── src/
-│           └── nira_esp32.ino       # Arduino sketch
+│   └── v1.0_esp32_fdc1004
+│       └── Project-Nira
+│           ├── platformio.ini
+│           └── src
+│               └── main.cpp         # PlatformIO code  
 ├── hardware/
 │   └── v1.0_esp32_sensor/
 │       ├── Schematics.pdf
