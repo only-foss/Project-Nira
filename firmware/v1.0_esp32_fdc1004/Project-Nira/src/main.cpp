@@ -1,5 +1,5 @@
 /**
- * NIRA v1.0.3 - Micro-plastic Detection Capacitive Flow Sensor
+ * NIRA v1.2.6- Micro-plastic Detection Capacitive Flow Sensor
  * ESP32 + ProtoCentral FDC1004 (C1 + C4 near-simultaneous sampling)
  *
  * Features:
@@ -33,17 +33,17 @@ FDC1004 fdc_sensor(&Wire, FDC1004_RATE_100HZ);
 
 // ============================================================================
 // WIFI + INFLUXDB CLOUD CONFIG
-const char* WIFI_SSID         = "MI";
-const char* WIFI_PASS         = "wasd1234";
+const char* WIFI_SSID         = "YOUR SSID";
+const char* WIFI_PASS         = "YOUR PASSWORD";
 
 // InfluxDB Cloud (free tier)
-#define INFLUXDB_URL          "https://us-east-1-1.aws.cloud2.influxdata.com"
-#define INFLUXDB_TOKEN        "xIntFu4vYl-FvKAXRUqzhxY1n-USXAvJdIbfxvT7B7ljGIwNUMH0SnDEUykb5klDGFFndQgTki5qA1kdrBZ2nQ=="
-#define INFLUXDB_ORG          "cce296f53ba40830"
-#define INFLUXDB_BUCKET       "Project-Nira"
-#define TZ_INFO               "Asia/Kolkata"
+#define INFLUXDB_URL          "INFLUXDB_URL"        // Your InfluxDB cloud link
+#define INFLUXDB_TOKEN        "TOCKEN"              // Your Tocken
+#define INFLUXDB_ORG          "ORG"                 // Your Bucket 
+#define INFLUXDB_BUCKET       "BUCKET"
+#define TZ_INFO               "Asia/Kolkata"        // Your Time Zone
 
-WiFiMulti wifiMulti;
+WiFiMulti wifiMulti; 
 InfluxDBClient client(INFLUXDB_URL, INFLUXDB_ORG, INFLUXDB_BUCKET, INFLUXDB_TOKEN, InfluxDbCloud2CACert);
 Point sensorData("nira_sensor");
 
@@ -78,7 +78,7 @@ void setup() {
   }
 
   Serial.println("time_ms,CH1_raw,CH4_raw,Diff_C1_C4,delta_us");
-  Serial.println("Sensor ready – 100 Hz sampling + InfluxDB + Grafana");
+  Serial.println("Sensor ready 100 Hz sampling + InfluxDB ");
 
   // WiFi
   wifiMulti.addAP(WIFI_SSID, WIFI_PASS);
@@ -171,8 +171,8 @@ void send_to_influxdb(uint16_t ch1, uint16_t ch4, float diff) {
 void print_banner() {
   Serial.println();
   Serial.println("=======================================");
-  Serial.println(" NIRA v2.5 – C1 + C4 Flow Sensor ");
-  Serial.println(" ESP32 + FDC1004 + InfluxDB + Grafana ");
+  Serial.println(" NIRA v2.5 C1 + C4 Flow Sensor ");
+  Serial.println(" ESP32 + FDC1004 + InfluxDB ");
   Serial.println("=======================================");
 }
 
