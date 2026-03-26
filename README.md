@@ -19,9 +19,9 @@
 
 **Affordable (₹2,500) · Portable · Expeimental · Fully open-source**
 
-*Detect microplastics in water without a ₹10L spectrometer.*
+*Aiming to Detect microplastics in water without a ₹10L spectrometer.*
 
-[Quick Start](#quick-start) · [Hardware](#hardware) · [Firmware](#firmware) · [Test Results](#test-results) · [Analysis](#analysis) · [Contributing](#contributing) · [License](#license)
+[Quick Start](#quick-start) · [Hardware](#hardware) · [Firmware](#firmware) · [Test Results](#test-results) · [Analysis](#analysis) · [Roadmap](#roadmap)· [Contributing](#contributing) · [License](#license)
 
 </div>
 
@@ -56,7 +56,7 @@ Microplastics (< 5 mm) are now found in rivers, lakes, groundwater, and drinking
 | p-value (Welch t-test) | 3.24×10⁻⁴⁵ |
 | Hardware license | CERN-OHL-P v2 |
 | Firmware license | GPL v3 |
-| Status | v1.0 breadboard — validated ✅ |
+| Status | v1.0 breadboard |
 
 ---
 
@@ -70,9 +70,11 @@ Project-Nira/
 │   ├── USAGE.md                     # Usage instructions
 │   └── Project-Nira_Open_Micro-plastic_Sensing.pdf
 ├── firmware/
-│   └── v1.0_esp32_fdc1004/
-│       └── src/
-│           └── nira_esp32.ino       # Arduino sketch
+│   └── v1.0_esp32_fdc1004
+│       └── Project-Nira
+│           ├── platformio.ini
+│           └── src
+│               └── main.cpp         # PlatformIO code  
 ├── hardware/
 │   └── v1.0_esp32_sensor/
 │       ├── Schematics.pdf
