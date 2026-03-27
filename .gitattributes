@@ -1,2 +1,13 @@
-*.m   linguist-language=Octave
-*.ino linguist-language=Arduino
+*.ino linguist-language=C++
+*.cpp linguist-language=C++
+*.h  linguist-language=C++
+*.c  linguist-language=C++
+*.m  linguist-language=MATLAB
+*.md linguist-language=Markdown
+*.kicad_pcb linguist-generated
+*.kicad_sch linguist-generated
+*.kicad_prl linguist-generated
+*.png binary
+*.jpg binary
+*.pdf binary
+*.stl binary
