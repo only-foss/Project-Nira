@@ -1,13 +1,28 @@
-*.ino linguist-language=C++
-*.cpp linguist-language=C++
-*.h  linguist-language=C++
-*.c  linguist-language=C++
-*.m  linguist-language=MATLAB
-*.md linguist-language=Markdown
+# Force correct language detection for GitHub
+
+# Arduino / C++ files
+*.ino  linguist-language=C++
+*.cpp  linguist-language=C++
+*.h    linguist-language=C++
+*.c    linguist-language=C++
+
+# Octave scripts (preferred over MATLAB)
+*.m    linguist-language=Octave
+
+# Markdown documentation
+*.md   linguist-language=Markdown
+
+# Ignore generated / binary files from language stats
+*.png  linguist-generated
+*.jpg  linguist-generated
+*.pdf  linguist-generated
+*.stl  linguist-generated
 *.kicad_pcb linguist-generated
 *.kicad_sch linguist-generated
-*.kicad_prl linguist-generated
-*.png binary
-*.jpg binary
-*.pdf binary
-*.stl binary
+*.bin  linguist-generated
+
+# Treat binary files properly
+*.png  binary
+*.jpg  binary
+*.pdf  binary
+*.stl  binary
