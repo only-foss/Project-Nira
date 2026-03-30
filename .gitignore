@@ -54,3 +54,5 @@ Thumbs.db
 temp/
 **/fp-info-cache
 venv/
+.venv/
+setup.bat
