@@ -17,13 +17,22 @@
 [![Status](https://img.shields.io/badge/Status-v1.0%20Validated-success?style=flat-square)]()
 [![Made with](https://img.shields.io/badge/Made%20with-GNU%20Octave-orange?style=flat-square)](https://octave.org/)
 
-**Affordable (₹2,500) · Portable · Expeimental · Fully open-source**
+**Affordable (₹2,500) · Portable · Experimental · Fully open-source**
 
 *Aiming to Detect microplastics in water without a ₹10L spectrometer.*
 
 [Quick Start](#quick-start) · [Hardware](#hardware) · [Firmware](#firmware) · [Test Results](#test-results) · [Analysis](#analysis) · [Roadmap](#roadmap)· [Contributing](#contributing) · [License](#license)
 
 </div>
+
+---
+
+## 🏆 FOSS Hack 2026: Field-Ready Updates (v1.5)
+Based on open check-in judge feedback, this repository now features **major field-deployable upgrades**:
+- **Temperature Compensation**: Integrated linear drift compensation algorithm in ESP32 firmware.
+- **Offline SD Logging**: Safe fallback logging buffer when WiFi goes down.
+- **Machine Learning**: `ml_pipeline/` directory added with a robust Random Forest classifier for precise particle detection.
+- **FOSS-Strict Infrastructure**: Complete support for self-hosted, open-source data layers (InfluxDB) without cloud dashboard lock-in.
 
 ---
 
