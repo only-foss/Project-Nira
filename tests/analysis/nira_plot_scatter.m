@@ -6,7 +6,7 @@
 %          conditions. Uses plot() for full Octave compatibility
 %          (avoids scatter() MarkerFaceAlpha issues).
 %
-% SPDX-License-Identifier: GPL-3.0-or-later
+% SPDX-License-Identifier: MIT
 % Copyright (C) 2026  only-foss
 % Repository: https://github.com/only-foss/Project-Nira
 % Hardware licensed under CERN-OHL-P v2

@@ -4,20 +4,11 @@
 % Purpose: Main analysis entry point — load data, compute
 %          statistics, run Welch t-test, call all plot functions
 %
-% SPDX-License-Identifier: GPL-3.0-or-later
+% SPDX-License-Identifier: MIT
 % Copyright (C) 2026  only-foss
 % Repository: https://github.com/only-foss/Project-Nira
 %
-% This program is free software: you can redistribute it and/or
-% modify it under the terms of the GNU General Public License as
-% published by the Free Software Foundation, either version 3 of
-% the License, or (at your option) any later version.
-%
-% This program is distributed in the hope that it will be useful,
-% but WITHOUT ANY WARRANTY; without even the implied warranty of
-% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-% GNU General Public License for more details.
-% <https://www.gnu.org/licenses/>
+% This software is released under the MIT License.
 %
 % Hardware licensed under CERN-OHL-P v2
 % <https://cern-ohl.web.cern.ch/>

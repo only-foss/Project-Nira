@@ -1,5 +1,5 @@
 # Project Nira — Python dependencies
-# SPDX-License-Identifier: GPL-3.0-or-later
+# SPDX-License-Identifier: MIT
 # https://github.com/only-foss/Project-Nira
 
 influxdb-client>=1.36.0
