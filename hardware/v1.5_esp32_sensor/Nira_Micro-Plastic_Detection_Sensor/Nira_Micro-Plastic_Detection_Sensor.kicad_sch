@@ -5,9 +5,9 @@
   (paper "A4")
 
   (title_block
-    (title "NIRA v1.0 - Micro-plastic Sensor")
+    (title "NIRA v1.5 - Micro-plastic Sensor")
     (date "2026-03-23")
-    (rev "v1.0")
+    (rev "v1.5")
     (company "FOSS UNITED")
     (comment 1 "CC-BY-SA 4.0 International")
   )

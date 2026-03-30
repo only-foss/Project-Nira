@@ -1,5 +1,5 @@
 /**
- * NIRA v1.2.6- Micro-plastic Detection Capacitive Flow Sensor
+ * NIRA v1.5- Micro-plastic Detection Capacitive Flow Sensor
  * ESP32 + ProtoCentral FDC1004 (C1 + C4 near-simultaneous sampling)
  *
  * Features:
@@ -203,7 +203,7 @@ void send_to_influxdb(uint16_t ch1, uint16_t ch4, float diff) {
 void print_banner() {
   Serial.println();
   Serial.println("=======================================");
-  Serial.println(" NIRA v2.5 C1 + C4 Flow Sensor ");
+  Serial.println(" NIRA v1.5 C1 + C4 Flow Sensor ");
   Serial.println(" ESP32 + FDC1004 + InfluxDB ");
   Serial.println("=======================================");
 }

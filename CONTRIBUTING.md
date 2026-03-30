@@ -56,7 +56,7 @@ Thank you for your interest in Project Nira. All contributions — hardware, fir
 - All hardware must be licensed under **CERN-OHL-P v2**
 - Include KiCad source files — PDFs alone are not sufficient
 - Include `BOM.csv` with supplier, part number, quantity, and reference designator
-- Version hardware as `vX.Y` (e.g. `v1.1`, `v2.0`)
+- Version hardware as `vX.Y` (e.g. `v1.6`, `v2.0`)
 - Export Gerbers to `hardware/vX.Y/pcb/` for PCB designs
 
 ---

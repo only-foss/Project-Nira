@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <export version="E">
   <design>
-    <source>/home/ghost/Downloads/Microplastic_Detection/hardware/v1.0_esp32_sensor/Nira_Micro-Plastic_Detection_Sensor/Nira_Micro-Plastic_Detection_Sensor.kicad_sch</source>
+    <source>/home/ghost/Downloads/Microplastic_Detection/hardware/v1.5_esp32_sensor/Nira_Micro-Plastic_Detection_Sensor/Nira_Micro-Plastic_Detection_Sensor.kicad_sch</source>
     <date>Mon 23 Mar 2026 08:05:06 AM IST</date>
     <tool>Eeschema 7.0.11+dfsg-1build4</tool>
     <sheet number="1" name="/" tstamps="/">
       <title_block>
-        <title>NIRA v1.0 - Micro-plastic Sensor</title>
+        <title>NIRA v1.5 - Micro-plastic Sensor</title>
         <company>FOSS UNITED</company>
-        <rev>v1.0</rev>
+        <rev>v1.5</rev>
         <date>2026-03-23</date>
         <source>Nira_Micro-Plastic_Detection_Sensor.kicad_sch</source>
         <comment number="1" value="CC-BY-SA 4.0 International"/>
