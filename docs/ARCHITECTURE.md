@@ -12,14 +12,28 @@ The key insight is that microplastic particles change the effective permittivity
 the water sample, which shows up as a measurable shift in the differential capacitance
 reading between two electrode channels.
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                     Project Nira v1.5                       │
-│                                                             │
-│  [Electrodes]──[FDC1004]──I2C──[ESP32]──WiFi──[InfluxDB]   │
-│                                    │                        │
-│                              [Grafana Dashboard]            │
-└─────────────────────────────────────────────────────────────┘
+```mermaid
+graph TD
+    classDef water fill:#e1f5fe,stroke:#0288d1,stroke-width:2px;
+    classDef hardware fill:#fff3e0,stroke:#f57c00,stroke-width:2px;
+    classDef cloud fill:#f3e5f5,stroke:#8e24aa,stroke-width:2px;
+    
+    W[Water Sample] ::: water
+    E1[Copper Electrode 1] ::: hardware
+    E2[Copper Electrode 2] ::: hardware
+    FDC[ProtoCentral FDC1004] ::: hardware
+    ESP[ESP32 Microcontroller] ::: hardware
+    DB[(InfluxDB)] ::: cloud
+    Dash[Grafana / Dashboard] ::: cloud
+    
+    W -->|Dielectric diff| E1
+    W -->|Dielectric diff| E2
+    E1 -.->|CIN1| FDC
+    E2 -.->|CIN4| FDC
+    FDC == I2C ==> ESP
+    ESP -- WiFi --> DB
+    ESP -- USB --> Dash
+    DB --> Dash
 ```
 
 ---

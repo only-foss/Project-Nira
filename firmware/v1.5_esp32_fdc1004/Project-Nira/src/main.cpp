@@ -31,16 +31,18 @@ static const uint8_t CH4_CIN = 3;  // C4
 
 FDC1004 fdc_sensor(&Wire, FDC1004_RATE_100HZ);
 
+#include "secrets.h"
+
 // ============================================================================
 // WIFI + INFLUXDB CONFIG (FOSS Compliant Local Instance)
-const char* WIFI_SSID         = "YOUR SSID";
-const char* WIFI_PASS         = "YOUR PASSWORD";
+const char* WIFI_SSID         = SECRET_WIFI_SSID;
+const char* WIFI_PASS         = SECRET_WIFI_PASS;
 
 // InfluxDB FOSS Local Instance
-#define INFLUXDB_URL          "http://192.168.1.100:8086" // Local FOSS InfluxDB 
-#define INFLUXDB_TOKEN        "TOKEN"               // Your Token
-#define INFLUXDB_ORG          "ORG"                 // Your Org
-#define INFLUXDB_BUCKET       "BUCKET"
+#define INFLUXDB_URL          SECRET_INFLUXDB_URL
+#define INFLUXDB_TOKEN        SECRET_INFLUXDB_TOKEN
+#define INFLUXDB_ORG          SECRET_INFLUXDB_ORG
+#define INFLUXDB_BUCKET       SECRET_INFLUXDB_BUCKET
 #define TZ_INFO               "Asia/Kolkata"        // Your Time Zone
 
 WiFiMulti wifiMulti; 
