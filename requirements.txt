@@ -1,6 +1,3 @@
-# Project Nira — Python Dependencies
-# SPDX-License-Identifier: MIT
-
 pyserial>=3.5
 matplotlib>=3.7.0
 pandas>=1.5.0
