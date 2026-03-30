@@ -11,7 +11,7 @@
 ### Open Hardware Microplastics Detector
 
 [![License: CERN-OHL-P](https://img.shields.io/badge/Hardware-CERN--OHL--P%20v2-blue?style=flat-square)](https://cern-ohl.web.cern.ch/)
-[![License: GPL v3](https://img.shields.io/badge/Firmware-GPL%20v3-blue?style=flat-square)](https://www.gnu.org/licenses/gpl-3.0)
+[![License: MIT](https://img.shields.io/badge/Software-MIT-blue?style=flat-square)](https://opensource.org/licenses/MIT)
 [![License: CC BY-SA 4.0](https://img.shields.io/badge/Docs-CC%20BY--SA%204.0-lightgrey?style=flat-square)](https://creativecommons.org/licenses/by-sa/4.0/)
 [![OSHW Compliant](https://img.shields.io/badge/OSHW-Compliant-brightgreen?style=flat-square)](https://www.oshwa.org/definition/)
 [![Status](https://img.shields.io/badge/Status-v1.5%20Validated-success?style=flat-square)]()
@@ -30,7 +30,7 @@
 ## 🏆 FOSS Hack 2026: Field-Ready Updates (v1.5)
 Based on open check-in judge feedback, this repository now features **major field-deployable upgrades**:
 - **Temperature Compensation**: Integrated linear drift compensation algorithm in ESP32 firmware.
-- **Real-Time Local Data Logging**: Use `python/serial_logger.py` to securely store output directly to your laptop over USB.
+- **Real-Time Local Data Logging & GUI**: Use `python/nira_dashboard.py` to visualize signals and securely store output directly to your laptop over USB.
 - **Machine Learning**: `ml_pipeline/` directory added with a robust Random Forest classifier for precise particle detection.
 - **FOSS-Strict Infrastructure**: Complete support for self-hosted, open-source data layers (InfluxDB) without cloud dashboard lock-in.
 
@@ -64,7 +64,7 @@ Microplastics (< 5 mm) are now found in rivers, lakes, groundwater, and drinking
 | Signal shift | +571 ADC (4.4σ above clean baseline) |
 | p-value (Welch t-test) | 3.24×10⁻⁴⁵ |
 | Hardware license | CERN-OHL-P v2 |
-| Firmware license | GPL v3 |
+| Software license | MIT |
 | Status | v1.5 breadboard |
 
 ---
@@ -130,6 +130,9 @@ Project-Nira/
 | Passive | 4.7kΩ pull-up resistors × 2 | I2C line conditioning |
 
 ### Wiring
+
+![Circuit Diagram](assets/Circuit-Conenction-Diagram-drawio.png)
+
 
 | FDC1004 Pin | ESP32 Pin | Colour | Notes |
 |-------------|-----------|--------|-------|
@@ -305,8 +308,7 @@ Contributions are welcome. Please read [CONTRIBUTING.md](CONTRIBUTING.md) before
 | Component | License |
 |-----------|---------|
 | Hardware (KiCad files, schematics) | [CERN-OHL-P v2](https://cern-ohl.web.cern.ch/) |
-| Firmware (Arduino sketch) | [GPL v3](https://www.gnu.org/licenses/gpl-3.0) |
-| Analysis scripts (GNU Octave) | [GPL v3](https://www.gnu.org/licenses/gpl-3.0) |
+| Software (Firmware, Python, Octave) | [MIT](https://opensource.org/licenses/MIT) |
 | Documentation | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) |
 
 See [LICENSE.md](LICENSE.md) for full terms.
