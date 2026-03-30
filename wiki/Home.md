@@ -7,5 +7,6 @@ Welcome to the Project Nira Wiki! This repository contains the open-source hardw
 - [Firmware Setup](Firmware-Setup.md)
 - [Machine Learning Pipeline](ML-Pipeline.md)
 - [Data Analysis](Data-Analysis.md)
+- [Dashboard & CLI Usage](Dashboard-Usage.md)
 
 This project was recently upgraded to **v1.5** for the FOSS Hack 2026, introducing Temperature Compensation, Offline SD Logging, and an ML-based detection pipeline!
