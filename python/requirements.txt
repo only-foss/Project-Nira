@@ -1,9 +1,10 @@
-# Project Nira — Python dependencies
+# Project Nira — Python Dependencies
 # SPDX-License-Identifier: MIT
-# https://github.com/only-foss/Project-Nira
 
-influxdb-client>=1.36.0
-pandas>=1.5.0
 pyserial>=3.5
+matplotlib>=3.7.0
+pandas>=1.5.0
 scikit-learn>=1.3.0
 joblib>=1.2.0
+influxdb-client>=1.36.0
+numpy>=1.24.0

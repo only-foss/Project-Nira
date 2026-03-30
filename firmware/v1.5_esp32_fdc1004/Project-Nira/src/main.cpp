@@ -6,18 +6,16 @@
  * • 100 Hz sampling rate
  * • C1 (library ch 0) and C4 (library ch 3)
  * • CSV output for Serial Plotter: time_ms,CH1_raw,CH4_raw,Diff_C1_C4,delta_us
- * • InfluxDB Cloud v2 + Grafana live dashboards
- *
  * License: MIT
  * Hardware license: CERN OHL-S v2
  */
 
 #include <Arduino.h>
-#include <Wire.h>
-#include <Protocentral_FDC1004.h>
-#include <WiFiMulti.h>
 #include <InfluxDbClient.h>
 #include <InfluxDbCloud.h>
+#include <Protocentral_FDC1004.h>
+#include <WiFiMulti.h>
+#include <Wire.h>
 
 // ============================================================================
 // HARDWARE PINS & CONFIG
@@ -26,8 +24,8 @@ static const uint8_t SCL_PIN = 22;
 static const uint16_t SAMPLE_INTERVAL_MS = 10; // 100 Hz
 
 // FDC1004 channels
-static const uint8_t CH1_CIN = 0;  // C1
-static const uint8_t CH4_CIN = 3;  // C4
+static const uint8_t CH1_CIN = 0; // C1
+static const uint8_t CH4_CIN = 3; // C4
 
 FDC1004 fdc_sensor(&Wire, FDC1004_RATE_100HZ);
 
@@ -35,28 +33,29 @@ FDC1004 fdc_sensor(&Wire, FDC1004_RATE_100HZ);
 
 // ============================================================================
 // WIFI + INFLUXDB CONFIG (FOSS Compliant Local Instance)
-const char* WIFI_SSID         = SECRET_WIFI_SSID;
-const char* WIFI_PASS         = SECRET_WIFI_PASS;
+const char *WIFI_SSID = SECRET_WIFI_SSID;
+const char *WIFI_PASS = SECRET_WIFI_PASS;
 
 // InfluxDB FOSS Local Instance
-#define INFLUXDB_URL          SECRET_INFLUXDB_URL
-#define INFLUXDB_TOKEN        SECRET_INFLUXDB_TOKEN
-#define INFLUXDB_ORG          SECRET_INFLUXDB_ORG
-#define INFLUXDB_BUCKET       SECRET_INFLUXDB_BUCKET
-#define TZ_INFO               "Asia/Kolkata"        // Your Time Zone
+#define INFLUXDB_URL SECRET_INFLUXDB_URL
+#define INFLUXDB_TOKEN SECRET_INFLUXDB_TOKEN
+#define INFLUXDB_ORG SECRET_INFLUXDB_ORG
+#define INFLUXDB_BUCKET SECRET_INFLUXDB_BUCKET
+#define TZ_INFO "Asia/Kolkata" // Your Time Zone
 
-WiFiMulti wifiMulti; 
+WiFiMulti wifiMulti;
 // Removed InfluxDbCloud2CACert to support local FOSS InfluxDB connections
-InfluxDBClient client(INFLUXDB_URL, INFLUXDB_ORG, INFLUXDB_BUCKET, INFLUXDB_TOKEN);
+InfluxDBClient client(INFLUXDB_URL, INFLUXDB_ORG, INFLUXDB_BUCKET,
+                      INFLUXDB_TOKEN);
 Point sensorData("nira_sensor");
 
 // ============================================================================
 // GLOBALS
-static uint32_t lastUpload    = 0;
+static uint32_t lastUpload = 0;
 static uint32_t lastWiFiCheck = 0;
 
 // ============================================================================
-// HELPER FUNCTION 
+// HELPER FUNCTION
 void print_banner();
 bool init_sensor();
 uint16_t read_channel(uint8_t ch);
@@ -67,7 +66,8 @@ void send_to_influxdb(uint16_t ch1, uint16_t ch4, float diff);
 // SETUP
 void setup() {
   Serial.begin(115200);
-  while (!Serial) delay(10);
+  while (!Serial)
+    delay(10);
   delay(1500);
 
   print_banner();
@@ -77,7 +77,8 @@ void setup() {
 
   if (!init_sensor()) {
     print_wiring_error();
-    while (true) delay(1000);
+    while (true)
+      delay(1000);
   }
 
   Serial.println("time_ms,CH1_raw,CH4_raw,Diff_C1_C4,Temp_C");
@@ -158,7 +159,8 @@ void loop() {
 // ============================================================================
 // INFLUXDB WRITE
 void send_to_influxdb(uint16_t ch1, uint16_t ch4, float diff) {
-  if (wifiMulti.run() != WL_CONNECTED) return;
+  if (wifiMulti.run() != WL_CONNECTED)
+    return;
 
   sensorData.clearFields();
   sensorData.addField("ch1_raw", ch1);
@@ -190,9 +192,7 @@ bool init_sensor() {
   return ok;
 }
 
-uint16_t read_channel(uint8_t ch) {
-  return fdc_sensor.getCapacitance(ch);
-}
+uint16_t read_channel(uint8_t ch) { return fdc_sensor.getCapacitance(ch); }
 
 void print_wiring_error() {
   Serial.println("\n=== WIRING ERROR ===");
