@@ -1,5 +1,12 @@
-import serial
-import time
+#!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026  only-foss — https://github.com/only-foss/Project-Nira
+"""
+Project Nira — Real-Time Serial Data Logger
+Reads ESP32 sensor output over USB and saves to local CSV.
+No WiFi, no InfluxDB required.
+"""
+
 import csv
 import sys
 import argparse
