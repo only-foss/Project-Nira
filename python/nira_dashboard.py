@@ -12,6 +12,7 @@ import csv
 import time
 import argparse
 import threading
+import typing
 import serial
 import serial.tools.list_ports
 from collections import deque
@@ -62,6 +63,21 @@ def run_gui_mode(default_port, default_baud, default_out):
     import matplotlib.animation as animation
 
     class NiraDashboard(tk.Tk):
+        serial_conn: typing.Any
+        fig: typing.Any
+        ax1: typing.Any
+        ax2: typing.Any
+        canvas: typing.Any
+        port_var: typing.Any
+        baud_var: typing.Any
+        file_var: typing.Any
+        window_var: typing.Any
+        port_cb: typing.Any
+        connect_btn: typing.Any
+        log_btn: typing.Any
+        status_lbl: typing.Any
+        idx: int
+        
         def __init__(self):
             super().__init__()
             self.title("Project Nira — Live Data Dashboard")
@@ -163,7 +179,7 @@ def run_gui_mode(default_port, default_baud, default_out):
                 self.file_var.set(f)
 
         def toggle_connection(self):
-            if self.serial_conn and self.serial_conn.is_open:
+            if self.serial_conn is not None and self.serial_conn.is_open:
                 self.serial_conn.close()
                 self.serial_conn = None
                 self.connect_btn.config(text="Connect")
@@ -204,17 +220,17 @@ def run_gui_mode(default_port, default_baud, default_out):
                 messagebox.showerror("Error", "Invalid Window Size")
 
         def serial_read_loop(self):
-            idx = 0
+            self.idx = 0
             while True:
-                if self.serial_conn and self.serial_conn.is_open:
+                if self.serial_conn is not None and self.serial_conn.is_open:
                     try:
                         while self.serial_conn.in_waiting:
                             line = self.serial_conn.readline().decode('utf-8', errors='ignore').strip()
                             parts = line.split(',')
                             if len(parts) == 5 and parts[0].isdigit():
                                 t, c1, c4, df, tmp = parts
-                                idx += 1
-                                self.t_data.append(idx)
+                                self.idx += 1
+                                self.t_data.append(self.idx)
                                 self.ch1_data.append(float(c1))
                                 self.ch4_data.append(float(c4))
                                 self.diff_data.append(float(df))
@@ -228,8 +244,8 @@ def run_gui_mode(default_port, default_baud, default_out):
                                     self.status_lbl.after(0, lambda: self.status_lbl.config(text="Status: Particle Detected!", foreground="orange"))
                                 else:
                                     self.status_lbl.after(0, lambda: self.status_lbl.config(text="Status: Clean", foreground="green"))
-                    except BaseException:
-                        pass
+                    except Exception as e:
+                        print(f"[ERROR] Serial read failed: {e}")
                 time.sleep(0.01)
 
         def update_plot(self, frame):
