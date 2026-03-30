@@ -18,8 +18,6 @@
 #include <WiFiMulti.h>
 #include <InfluxDbClient.h>
 #include <InfluxDbCloud.h>
-#include <SD.h>
-#include <SPI.h>
 
 // ============================================================================
 // HARDWARE PINS & CONFIG
@@ -49,10 +47,6 @@ WiFiMulti wifiMulti;
 // Removed InfluxDbCloud2CACert to support local FOSS InfluxDB connections
 InfluxDBClient client(INFLUXDB_URL, INFLUXDB_ORG, INFLUXDB_BUCKET, INFLUXDB_TOKEN);
 Point sensorData("nira_sensor");
-
-// SD Card Configuration
-const int SD_CS_PIN = 5;
-bool sd_ok = false;
 
 // ============================================================================
 // GLOBALS
@@ -84,16 +78,8 @@ void setup() {
     while (true) delay(1000);
   }
 
-  // Initialize SD Card
-  if (SD.begin(SD_CS_PIN)) {
-    sd_ok = true;
-    Serial.println("SD Card initialized.");
-  } else {
-    Serial.println("SD initialization failed or not present.");
-  }
-
   Serial.println("time_ms,CH1_raw,CH4_raw,Diff_C1_C4,Temp_C");
-  Serial.println("Sensor ready 100 Hz sampling + InfluxDB + SD Logging");
+  Serial.println("Sensor ready 100 Hz sampling + InfluxDB");
 
   // WiFi
   wifiMulti.addAP(WIFI_SSID, WIFI_PASS);
@@ -150,19 +136,6 @@ void loop() {
     Serial.print(comp_diff);
     Serial.print(',');
     Serial.println(temp_c);
-
-    // Offline SD Logging
-    if (sd_ok) {
-      File file = SD.open("/nira_log.csv", FILE_APPEND);
-      if (file) {
-        file.print(now); file.print(",");
-        file.print(ch1_raw); file.print(",");
-        file.print(ch4_raw); file.print(",");
-        file.print(comp_diff); file.print(",");
-        file.println(temp_c);
-        file.close();
-      }
-    }
 
     // Upload every 1 s
     if (now - lastUpload >= 1000UL) {

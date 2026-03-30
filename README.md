@@ -30,7 +30,7 @@
 ## 🏆 FOSS Hack 2026: Field-Ready Updates (v1.5)
 Based on open check-in judge feedback, this repository now features **major field-deployable upgrades**:
 - **Temperature Compensation**: Integrated linear drift compensation algorithm in ESP32 firmware.
-- **Offline SD Logging**: Safe fallback logging buffer when WiFi goes down.
+- **Real-Time Local Data Logging**: Use `python/serial_logger.py` to securely store output directly to your laptop over USB.
 - **Machine Learning**: `ml_pipeline/` directory added with a robust Random Forest classifier for precise particle detection.
 - **FOSS-Strict Infrastructure**: Complete support for self-hosted, open-source data layers (InfluxDB) without cloud dashboard lock-in.
 
