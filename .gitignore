@@ -1,6 +1,4 @@
 # Build / firmware
-firmware/v1.0_esp32_fdc1004/build/
-firmware/**/build/
 firmware/**/sdkconfig
 firmware/**/sdkconfig.old
 firmware/**/*.elf
@@ -36,6 +34,9 @@ Thumbs.db
 *.swp
 *.swo
 *.tmp
+
+#draw.io
+*.bkp
 
 # IDE / misc
 *.log
