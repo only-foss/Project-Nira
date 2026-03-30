@@ -43,7 +43,7 @@ Thank you for your interest in Project Nira. All contributions — hardware, fir
 
 | Type | Format | Example |
 |------|--------|---------|
-| Feature | `feat/description` | `feat/pcb-v2-layout` |
+| Feature | `feature/description` | `feature/pcb-v2-layout` |
 | Bug fix | `fix/description` | `fix/fdc1004-i2c-timeout` |
 | Documentation | `docs/description` | `docs/hindi-translation` |
 | Hardware | `hw/description` | `hw/enclosure-v1` |
@@ -56,7 +56,7 @@ Thank you for your interest in Project Nira. All contributions — hardware, fir
 - All hardware must be licensed under **CERN-OHL-P v2**
 - Include KiCad source files — PDFs alone are not sufficient
 - Include `BOM.csv` with supplier, part number, quantity, and reference designator
-- Version hardware as `vX.Y` (e.g. `v1.1`, `v2.0`)
+- Version hardware as `vX.Y` (e.g. `v1.6`, `v2.0`)
 - Export Gerbers to `hardware/vX.Y/pcb/` for PCB designs
 
 ---

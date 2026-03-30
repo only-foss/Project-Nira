@@ -47,7 +47,7 @@ clear; clc; close all;
 
 printf('==============================================\n');
 printf(' Project Nira - Microplastic Sensor Analysis\n');
-printf(' v1.0  |  github.com/only-foss/Project-Nira  \n');
+printf(' v1.5  |  github.com/only-foss/Project-Nira  \n');
 printf('==============================================\n\n');
 
 % ---- Load Data -----------------------------------------------

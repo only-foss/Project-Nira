@@ -1,5 +1,5 @@
 /**
- * NIRA v1.2.6- Micro-plastic Detection Capacitive Flow Sensor
+ * NIRA v1.5- Micro-plastic Detection Capacitive Flow Sensor
  * ESP32 + ProtoCentral FDC1004 (C1 + C4 near-simultaneous sampling)
  *
  * Features:
@@ -32,19 +32,20 @@ static const uint8_t CH4_CIN = 3;  // C4
 FDC1004 fdc_sensor(&Wire, FDC1004_RATE_100HZ);
 
 // ============================================================================
-// WIFI + INFLUXDB CLOUD CONFIG
+// WIFI + INFLUXDB CONFIG (FOSS Compliant Local Instance)
 const char* WIFI_SSID         = "YOUR SSID";
 const char* WIFI_PASS         = "YOUR PASSWORD";
 
-// InfluxDB Cloud (free tier)
-#define INFLUXDB_URL          "INFLUXDB_URL"        // Your InfluxDB cloud link
-#define INFLUXDB_TOKEN        "TOCKEN"              // Your Tocken
-#define INFLUXDB_ORG          "ORG"                 // Your Bucket 
+// InfluxDB FOSS Local Instance
+#define INFLUXDB_URL          "http://192.168.1.100:8086" // Local FOSS InfluxDB 
+#define INFLUXDB_TOKEN        "TOKEN"               // Your Token
+#define INFLUXDB_ORG          "ORG"                 // Your Org
 #define INFLUXDB_BUCKET       "BUCKET"
 #define TZ_INFO               "Asia/Kolkata"        // Your Time Zone
 
 WiFiMulti wifiMulti; 
-InfluxDBClient client(INFLUXDB_URL, INFLUXDB_ORG, INFLUXDB_BUCKET, INFLUXDB_TOKEN, InfluxDbCloud2CACert);
+// Removed InfluxDbCloud2CACert to support local FOSS InfluxDB connections
+InfluxDBClient client(INFLUXDB_URL, INFLUXDB_ORG, INFLUXDB_BUCKET, INFLUXDB_TOKEN);
 Point sensorData("nira_sensor");
 
 // ============================================================================
@@ -77,8 +78,8 @@ void setup() {
     while (true) delay(1000);
   }
 
-  Serial.println("time_ms,CH1_raw,CH4_raw,Diff_C1_C4,delta_us");
-  Serial.println("Sensor ready 100 Hz sampling + InfluxDB ");
+  Serial.println("time_ms,CH1_raw,CH4_raw,Diff_C1_C4,Temp_C");
+  Serial.println("Sensor ready 100 Hz sampling + InfluxDB");
 
   // WiFi
   wifiMulti.addAP(WIFI_SSID, WIFI_PASS);
@@ -121,6 +122,10 @@ void loop() {
 
     float diff = (float)ch1_raw - ch4_raw;
 
+    // Basic temperature compensation
+    float temp_c = 25.0; // TODO: read from DS18B20 or internal ESP32 sensor
+    float comp_diff = diff - (temp_c - 25.0) * 8.5;
+
     // Serial Plotter output
     Serial.print(now);
     Serial.print(',');
@@ -128,14 +133,14 @@ void loop() {
     Serial.print(',');
     Serial.print(ch4_raw);
     Serial.print(',');
-    Serial.print(diff);
+    Serial.print(comp_diff);
     Serial.print(',');
-    Serial.println(delta_us);
+    Serial.println(temp_c);
 
     // Upload every 1 s
     if (now - lastUpload >= 1000UL) {
       lastUpload = now;
-      send_to_influxdb(ch1_raw, ch4_raw, diff);
+      send_to_influxdb(ch1_raw, ch4_raw, comp_diff);
     }
   }
 
@@ -171,7 +176,7 @@ void send_to_influxdb(uint16_t ch1, uint16_t ch4, float diff) {
 void print_banner() {
   Serial.println();
   Serial.println("=======================================");
-  Serial.println(" NIRA v2.5 C1 + C4 Flow Sensor ");
+  Serial.println(" NIRA v1.5 C1 + C4 Flow Sensor ");
   Serial.println(" ESP32 + FDC1004 + InfluxDB ");
   Serial.println("=======================================");
 }

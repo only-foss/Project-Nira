@@ -23,10 +23,18 @@ hardware/*/pcb/*.sch-bak
 *.kicad_pcb-backup*
 *.kicad_pcb.lck
 *.kicad_sch.lck
+~*.kicad_sch.lck
+~*.kicad_pcb.lck
+_autosave-*.kicad_sch
+_autosave-*.kicad_pcb
 fp-info-cache
 __pycache__/
 #auto_saved_files#
 *-backups/
+
+# Binary ML models - use Git LFS or GitHub Releases instead
+model_export/*.pkl
+model_export/*.tflite
 
 # OS / editor
 .DS_Store
@@ -45,3 +53,4 @@ Thumbs.db
 
 temp/
 **/fp-info-cache
+venv/

@@ -5,12 +5,12 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) | Versioning: [
 
 ---
 
-## [v1.0] — 2026-03-22 — First Validated Prototype
+## [v1.5] — 2026-03-22 — First Validated Prototype
 
 ### Hardware
 - ESP32 DevKit v1 + ProtoCentral FDC1004 Breakout v3 breadboard prototype
 - 2× copper plate electrodes as capacitance sensing elements
-- KiCad schematic and PCB layout (v1.0)
+- KiCad schematic and PCB layout (v1.5)
 - Custom KiCad symbols: `ESP32-DEVKIT-V1.kicad_sym`, `PC-FDC1004-v3.kicad_sym`
 - STEP 3D models added for ESP32 and FDC1004
 - BOM.csv with component sourcing details
@@ -64,8 +64,8 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) | Versioning: [
 
 ## [Unreleased] — In Progress
 
-### Planned for v1.1
-- [ ] Export Gerber files to `hardware/v1.0_esp32_sensor/pcb/`
+### Planned for v1.6
+- [ ] Export Gerber files to `hardware/v1.5_esp32_sensor/pcb/`
 - [ ] PCB design to replace breadboard prototype
 - [ ] `python/nira_reader.py` — InfluxDB data export utility
 - [ ] `python/requirements.txt` — Python dependencies
@@ -74,7 +74,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) | Versioning: [
 - [ ] IP67 enclosure CAD files in `mechanical/`
 - [ ] Firmware dependency list (`libraries.txt` or `platformio.ini`)
 - [ ] OSHWA certification submission
-- [ ] GitHub Release tag `v1.0`
+- [ ] GitHub Release tag `v1.5`
 - [ ] Issue templates (`.github/ISSUE_TEMPLATE/`)
 
 ### Planned for v2.0

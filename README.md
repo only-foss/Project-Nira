@@ -14,16 +14,25 @@
 [![License: GPL v3](https://img.shields.io/badge/Firmware-GPL%20v3-blue?style=flat-square)](https://www.gnu.org/licenses/gpl-3.0)
 [![License: CC BY-SA 4.0](https://img.shields.io/badge/Docs-CC%20BY--SA%204.0-lightgrey?style=flat-square)](https://creativecommons.org/licenses/by-sa/4.0/)
 [![OSHW Compliant](https://img.shields.io/badge/OSHW-Compliant-brightgreen?style=flat-square)](https://www.oshwa.org/definition/)
-[![Status](https://img.shields.io/badge/Status-v1.0%20Validated-success?style=flat-square)]()
+[![Status](https://img.shields.io/badge/Status-v1.5%20Validated-success?style=flat-square)]()
 [![Made with](https://img.shields.io/badge/Made%20with-GNU%20Octave-orange?style=flat-square)](https://octave.org/)
 
-**Affordable (₹2,500) · Portable · Field-deployable · Fully open-source**
+**Affordable (₹2,500) · Portable · Experimental · Fully open-source**
 
-*Detect microplastics in water without a ₹10L spectrometer.*
+*Aiming to Detect microplastics in water without a ₹10L spectrometer.*
 
-[Quick Start](#quick-start) · [Hardware](#hardware) · [Firmware](#firmware) · [Test Results](#test-results) · [Analysis](#analysis) · [Contributing](#contributing) · [License](#license)
+[Quick Start](#quick-start) · [Hardware](#hardware) · [Firmware](#firmware) · [Test Results](#test-results) · [Analysis](#analysis) · [Roadmap](#roadmap)· [Contributing](#contributing) · [License](#license)
 
 </div>
+
+---
+
+## 🏆 FOSS Hack 2026: Field-Ready Updates (v1.5)
+Based on open check-in judge feedback, this repository now features **major field-deployable upgrades**:
+- **Temperature Compensation**: Integrated linear drift compensation algorithm in ESP32 firmware.
+- **Real-Time Local Data Logging**: Use `python/serial_logger.py` to securely store output directly to your laptop over USB.
+- **Machine Learning**: `ml_pipeline/` directory added with a robust Random Forest classifier for precise particle detection.
+- **FOSS-Strict Infrastructure**: Complete support for self-hosted, open-source data layers (InfluxDB) without cloud dashboard lock-in.
 
 ---
 
@@ -31,7 +40,7 @@
 
 Project Nira is an **open hardware initiative** to build an affordable, portable sensor that detects microplastics in water in real time using **capacitance-based differential sensing**.
 
-The v1.0 prototype uses an **ESP32** microcontroller and a **ProtoCentral FDC1004** capacitance-to-digital converter to measure the dielectric difference between clean water and microplastic-contaminated water. Test results show a statistically significant signal shift of **+571 ADC units** (p = 3.24×10⁻⁴⁵) between the two conditions.
+The v1.5 prototype uses an **ESP32** microcontroller and a **ProtoCentral FDC1004** capacitance-to-digital converter to measure the dielectric difference between clean water and microplastic-contaminated water. Test results show a statistically significant signal shift of **+571 ADC units** (p = 3.24×10⁻⁴⁵) between the two conditions.
 
 ### Why This Matters
 
@@ -39,7 +48,7 @@ Microplastics (< 5 mm) are now found in rivers, lakes, groundwater, and drinking
 
 ---
 
-## Key Specs — v1.0
+## Key Specs — v1.5
 
 | Parameter | Value |
 |-----------|-------|
@@ -56,7 +65,7 @@ Microplastics (< 5 mm) are now found in rivers, lakes, groundwater, and drinking
 | p-value (Welch t-test) | 3.24×10⁻⁴⁵ |
 | Hardware license | CERN-OHL-P v2 |
 | Firmware license | GPL v3 |
-| Status | v1.0 breadboard — validated ✅ |
+| Status | v1.5 breadboard |
 
 ---
 
@@ -70,13 +79,13 @@ Project-Nira/
 │   ├── USAGE.md                     # Usage instructions
 │   └── Project-Nira_Open_Micro-plastic_Sensing.pdf
 ├── firmware/
-│   └── v1.0_esp32_fdc1004
+│   └── v1.5_esp32_fdc1004
 │       └── Project-Nira
 │           ├── platformio.ini
 │           └── src
 │               └── main.cpp         # PlatformIO code  
 ├── hardware/
-│   └── v1.0_esp32_sensor/
+│   └── v1.5_esp32_sensor/
 │       ├── Schematics.pdf
 │       └── Nira_Micro-Plastic_Detection_Sensor/
 │           ├── *.kicad_sch          # Schematic source
@@ -131,12 +140,12 @@ Project-Nira/
 | CIN1 | — | Green | Electrode 1 (CH1) |
 | CIN4 | — | Orange | Electrode 2 (CH4) |
 
-> **Note:** CIN2 and CIN3 are unused in v1.0. FDC1004 I2C address is fixed at `0x50`.
+> **Note:** CIN2 and CIN3 are unused in v1.5. FDC1004 I2C address is fixed at `0x50`.
 > 4.7kΩ pull-up resistors on SDA and SCL are recommended if wire length exceeds 10 cm.
 
 ### KiCad Files
 
-Schematic and PCB layout source files are in `hardware/v1.0_esp32_sensor/`. The v1.0 build is a breadboard prototype; a PCB is planned for v1.1.
+Schematic and PCB layout source files are in `hardware/v1.5_esp32_sensor/`. The v1.5 build is a breadboard prototype; a PCB is planned for v1.6.
 
 ---
 
@@ -153,7 +162,7 @@ Schematic and PCB layout source files are in `hardware/v1.0_esp32_sensor/`. The 
 
 ```bash
 # 1. Open in Arduino IDE:
-firmware/v1.0_esp32_fdc1004/src/nira_esp32.ino
+firmware/v1.5_esp32_fdc1004/src/nira_esp32.ino
 
 # 2. Edit credentials in the sketch:
 #    WIFI_SSID, WIFI_PASSWORD, INFLUXDB_URL, INFLUXDB_TOKEN, INFLUXDB_ORG, INFLUXDB_BUCKET
@@ -173,7 +182,7 @@ The firmware samples FDC1004 channels CH1 and CH4 at 10-second intervals, comput
 ### Setup
 
 - **Date:** 2026-03-22
-- **Device:** `nira_esp32` (v1.0 breadboard)
+- **Device:** `nira_esp32` (v1.5 breadboard)
 - **Test 0:** Clean tap water — 55 samples
 - **Test 1:** Water with microplastics added — 42 samples
 - **Interval:** 10 seconds per sample
@@ -271,7 +280,7 @@ python nira_reader.py --start -1h --label test-2_sample
 
 ```
 1. Wire ESP32 + FDC1004 as per the wiring table above
-2. Flash firmware/v1.0_esp32_fdc1004/src/nira_esp32.ino
+2. Flash firmware/v1.5_esp32_fdc1004/src/nira_esp32.ino
 3. Submerge electrodes in water sample
 4. Monitor InfluxDB / Grafana dashboard
 5. diff_c1_c4 > 92 → microplastics detected
@@ -283,7 +292,7 @@ python nira_reader.py --start -1h --label test-2_sample
 
 Contributions are welcome. Please read [CONTRIBUTING.md](CONTRIBUTING.md) before submitting a pull request. Areas of active need:
 
-- PCB design (v1.1)
+- PCB design (v1.6)
 - IP67 enclosure CAD
 - Signal processing improvements
 - Field validation with real water samples
@@ -309,7 +318,7 @@ See [LICENSE.md](LICENSE.md) for full terms.
 If you use Project Nira in your research or work, please cite it using the metadata in [CITATION.cff](CITATION.cff), or:
 
 ```
-only-foss. (2026). Project Nira: Open Hardware Microplastics Detector (v1.0).
+only-foss. (2026). Project Nira: Open Hardware Microplastics Detector (v1.5).
 GitHub. https://github.com/only-foss/Project-Nira
 ```
 

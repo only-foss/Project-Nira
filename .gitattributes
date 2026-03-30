@@ -1,2 +1,30 @@
-*.m   linguist-language=Octave
-*.ino linguist-language=Arduino
+# Force C++ for Arduino firmware (this should be the majority)
+*.ino  linguist-language=C++
+*.cpp  linguist-language=C++
+*.h    linguist-language=C++
+
+# Try to force Octave for .m files
+*.m    linguist-language=Octave
+
+# Fallback: mark analysis scripts as generated / vendored to reduce MATLAB weight
+tests/analysis/*.m    linguist-vendored
+tests/*.m             linguist-vendored
+*.m                   linguist-vendored=false
+
+# Markdown
+*.md   linguist-language=Markdown
+
+# Binary / generated files (exclude from language stats)
+*.png  linguist-generated
+*.jpg  linguist-generated
+*.pdf  linguist-generated
+*.stl  linguist-generated
+*.kicad_pcb linguist-generated
+*.kicad_sch linguist-generated
+*.bin  linguist-generated
+
+# Binary handling
+*.png  binary
+*.jpg  binary
+*.pdf  binary
+*.stl  binary
