@@ -5,6 +5,9 @@ This guide details the setup and operation of the Project-Nira microplastics det
 ---
 
 ### Hardware Setup
+
+![Project Nira Circuit Diagram](../assets/Circuit-Conenction-Diagram-drawio.png)
+
 1. **Sensor Placement:** Position the two copper electrodes along the water flow path.
 2. **FDC1004 Connection:** Connect the electrodes to the ProtoCentral FDC1004 inputs **CIN1 (CH1)** and **CIN4 (CH4)**.
 3. **Microcontroller Wiring:** Connect the FDC1004 to the **ESP32** via the I2C interface:
@@ -26,12 +29,15 @@ This guide details the setup and operation of the Project-Nira microplastics det
 
 ### Operation Options
 
-#### Option A — Real-Time Serial Logging (Recommended, no WiFi required)
+#### Option A — Desktop GUI Dashboard (Recommended, no WiFi required)
+The Python dashboard allows you to view live capacitance plots, tweak parameters, and record to CSV locally over USB context.
+
 ```bash
-pip install pyserial
-python python/serial_logger.py --port /dev/ttyUSB0
-# On Windows: --port COM3
-# Output saved to nira_local_log.csv
+# Launch the desktop UI
+python python/nira_dashboard.py
+
+# OR launch in headless CLI mode logging to a specific file:
+python python/nira_dashboard.py --cli --port /dev/ttyUSB0 --baud 115200 --out my_data.csv
 ```
 
 #### Option B — InfluxDB + Grafana Dashboard
