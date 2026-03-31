@@ -21,10 +21,10 @@
 
 ## 2. Phase 0: Immediate Fixes (27–28 March)
 
-- [ ] Merge `feature/platformio-migration` branch into `main`
-- [ ] Add temperature compensation (ESP32 built-in sensor + DS18B20 option)
-- [ ] Implement offline SD card logging with fallback
-- [ ] Update README.md — remove over-promising statements and add honest status
+- [x] Merge `feature/platformio-migration` branch into `main`
+- [x] Add temperature compensation (ESP32 built-in sensor + DS18B20 option)
+- [x] Implement offline SD card logging with fallback
+- [x] Update README.md — remove over-promising statements and add honest status
 - [ ] Record and upload 3-minute pure demo video (showing live + offline mode)
 
 ## 3. Phase 1: V1 Field-Ready (29–31 March)

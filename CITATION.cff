@@ -11,7 +11,7 @@ url: "https://github.com/only-foss/Project-Nira"
 abstract: >
   Project Nira is an open-source hardware sensor for detecting microplastics
   in water using capacitance-based differential sensing (FDC1004 + ESP32).
-  The v1.0 prototype demonstrates statistically significant separation between
+  The v1.5 prototype demonstrates statistically significant separation between
   clean water and microplastic-contaminated water (p < 0.001, shift = 571 ADC units).
 keywords:
   - microplastics

@@ -1,2 +1,7 @@
-*.m   linguist-language=Octave
-*.ino linguist-language=Arduino
+# Ignore analysis tests from GitHub language statistics
+tests/analysis/*.m linguist-vendored=true
+
+# Force specific languages
+*.cpp linguist-language=C++
+*.ino linguist-language=C++
+*.py linguist-language=Python

@@ -1,6 +1,6 @@
 # Architecture — Project Nira
 
-> System design, component decisions, and data flow for the v1.0 prototype.
+> System design, component decisions, and data flow for the v1.5 prototype.
 
 ---
 
@@ -12,14 +12,28 @@ The key insight is that microplastic particles change the effective permittivity
 the water sample, which shows up as a measurable shift in the differential capacitance
 reading between two electrode channels.
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                     Project Nira v1.0                       │
-│                                                             │
-│  [Electrodes]──[FDC1004]──I2C──[ESP32]──WiFi──[InfluxDB]   │
-│                                    │                        │
-│                              [Grafana Dashboard]            │
-└─────────────────────────────────────────────────────────────┘
+```mermaid
+graph TD
+    classDef water fill:#e1f5fe,stroke:#0288d1,stroke-width:2px;
+    classDef hardware fill:#fff3e0,stroke:#f57c00,stroke-width:2px;
+    classDef cloud fill:#f3e5f5,stroke:#8e24aa,stroke-width:2px;
+    
+    W[Water Sample] ::: water
+    E1[Copper Electrode 1] ::: hardware
+    E2[Copper Electrode 2] ::: hardware
+    FDC[ProtoCentral FDC1004] ::: hardware
+    ESP[ESP32 Microcontroller] ::: hardware
+    DB[(InfluxDB)] ::: cloud
+    Dash[Grafana / Dashboard] ::: cloud
+    
+    W -->|Dielectric diff| E1
+    W -->|Dielectric diff| E2
+    E1 -.->|CIN1| FDC
+    E2 -.->|CIN4| FDC
+    FDC == I2C ==> ESP
+    ESP -- WiFi --> DB
+    ESP -- USB --> Dash
+    DB --> Dash
 ```
 
 ---
@@ -47,7 +61,7 @@ Water Sample
 
 ### Why FDC1004?
 
-The Texas Instruments FDC1004 was chosen for v1.0 because:
+The Texas Instruments FDC1004 was chosen for v1.5 because:
 - 4 independent capacitance channels (we use CH1 and CH4)
 - 16-bit resolution, ±15pF range
 - I2C interface — easy to wire to ESP32
@@ -65,7 +79,7 @@ channel reading provides:
 
 ### Detection threshold
 
-Based on v1.0 test results:
+Based on v1.5 test results:
 - Clean water: mean diff = −193.6 ADC, std = 128.6
 - Microplastics: mean diff = +377.8 ADC, std = 69.9
 - Threshold: **diff_c1_c4 > 92 ADC units** (midpoint between means)
@@ -121,7 +135,7 @@ measurement: nira_sensor
 ```
 InfluxDB export (CSV)
     │
-    ├── python/nira_reader.py     — automated export (planned v1.1)
+    ├── python/nira_reader.py     — automated export (planned v1.6)
     │   OR manual CSV export from InfluxDB UI
     │
     └── tests/analysis/
@@ -164,8 +178,8 @@ Project-Nira/
 │   ├── cad/                — 3D models and KiCad symbols
 │   ├── pcb/                — Gerber fabrication outputs
 │   └── Nira_.../           — KiCad project folder
-├── mechanical/             — Enclosure CAD (planned v1.1)
-├── python/                 — Data utilities (planned v1.1)
+├── mechanical/             — Enclosure CAD (planned v1.6)
+├── python/                 — Data utilities (planned v1.6)
 └── tests/
     ├── analysis/           — Octave scripts + input CSVs
     ├── data/               — Raw InfluxDB exports
@@ -176,8 +190,8 @@ Project-Nira/
 ### Versioning strategy
 
 Hardware and firmware are versioned independently using `vMAJOR.MINOR`:
-- `v1.0` — initial validated prototype
-- `v1.1` — PCB, Gerbers, enclosure (planned)
+- `v1.5` — initial validated prototype
+- `v1.6` — PCB, Gerbers, enclosure (planned)
 - `v2.0` — new sensing platform ESP32-S3 + ADS131M08 (planned)
 
 Each version gets its own subfolder so older versions remain accessible.
@@ -193,11 +207,11 @@ Each version gets its own subfolder so older versions remain accessible.
 | Data storage | InfluxDB | SD card, serial | Remote access, time-series optimised |
 | Analysis tool | GNU Octave | Python/pandas | FOSS, no install friction, .m files readable |
 | License | CERN-OHL-P | CERN-OHL-S, CC | Permissive — allows commercial use with attribution |
-| Build form | Breadboard (v1.0) | Custom PCB | Faster iteration, lower barrier to reproduce |
+| Build form | Breadboard (v1.5) | Custom PCB | Faster iteration, lower barrier to reproduce |
 
 ---
 
-## Known Limitations — v1.0
+## Known Limitations — v1.5
 
 - Breadboard prototype — not weatherproof or field-deployable
 - No on-device detection — requires external InfluxDB + analysis

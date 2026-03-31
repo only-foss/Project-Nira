@@ -4,7 +4,7 @@
 % Purpose: Time-series plot of CH1, CH4, and diff_c1_c4 for
 %          both test conditions (clean water vs microplastics)
 %
-% SPDX-License-Identifier: GPL-3.0-or-later
+% SPDX-License-Identifier: MIT
 % Copyright (C) 2026  only-foss
 % Repository: https://github.com/only-foss/Project-Nira
 % Hardware licensed under CERN-OHL-P v2

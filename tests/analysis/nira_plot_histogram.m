@@ -6,7 +6,7 @@
 %          Uses patch polygons for FaceAlpha compatibility
 %          across all GNU Octave versions (no extra packages).
 %
-% SPDX-License-Identifier: GPL-3.0-or-later
+% SPDX-License-Identifier: MIT
 % Copyright (C) 2026  only-foss
 % Repository: https://github.com/only-foss/Project-Nira
 % Hardware licensed under CERN-OHL-P v2
