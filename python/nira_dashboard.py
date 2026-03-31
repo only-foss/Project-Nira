@@ -102,8 +102,9 @@ def run_gui_mode(default_port, default_baud, default_out):
             self.read_thread = threading.Thread(target=self.serial_read_loop, daemon=True)
             self.read_thread.start()
             
-            # Matplotlib Animation
-            self.anim = animation.FuncAnimation(self.fig, self.update_plot, interval=100, blit=False)
+            # # Matplotlib Animation
+            # self.anim = animation.FuncAnimation(self.fig, self.update_plot, interval=100, blit=False)
+            self.anim = animation.FuncAnimation(self.fig, self.update_plot, interval=100, blit=False, cache_frame_data=False)
 
         def build_ui(self):
             # Left Panel: Controls
@@ -209,7 +210,7 @@ def run_gui_mode(default_port, default_baud, default_out):
 
         def apply_params(self):
             try:
-                new_size = int(self.window_var.get())
+                new_size = int(self.window_var.get() or "256")   # or 512, 100, etc.
                 self.max_pts = new_size
                 # recreate deques
                 self.t_data = deque(self.t_data, maxlen=self.max_pts)
@@ -262,12 +263,17 @@ def run_gui_mode(default_port, default_baud, default_out):
             self.ax2.set_ylabel("Diff (C1 - C4)")
             self.ax2.set_xlabel("Samples")
 
+
             self.ax1.plot(self.t_data, self.ch1_data, color='blue', alpha=0.7)
             self.ax1.plot(self.t_data, self.ch4_data, color='orange', alpha=0.7)
             
             self.ax2.plot(self.t_data, self.diff_data, color='purple')
             self.ax2.axhline(0, color='gray', linestyle='--', alpha=0.5)
-
+        # === AUTO SCALING FIX - Add this block ===
+        if hasattr(self, 'ax') and len(self.x_data) > 5:   # Only after some data arrives
+            self.ax.relim()                  # Re-calculate data limits
+            self.ax.autoscale_view(True, True, True)  # Auto scale X and Y
+            self.fig.canvas.draw_idle()      # Force redraw
     app = NiraDashboard()
     app.mainloop()
 
