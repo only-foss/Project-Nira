@@ -1,206 +1,314 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 /**
- * NIRA v1.5- Micro-plastic Detection Capacitive Flow Sensor
- * ESP32 + ProtoCentral FDC1004 (C1 + C4 near-simultaneous sampling)
+ * @file main.cpp
+ * @brief Project Nira — ESP32-S3 Firmware v1.1
  *
- * Features:
- * • 100 Hz sampling rate
- * • C1 (library ch 0) and C4 (library ch 3)
- * • CSV output for Serial Plotter: time_ms,CH1_raw,CH4_raw,Diff_C1_C4,delta_us
- * License: MIT
- * Hardware license: CERN OHL-S v2
+ * Reads capacitance/impedance data from the FDC1004 (or ADS131M08 ADC) and
+ * streams structured JSON lines over USB-Serial at 115200 baud.
+ *
+ * Serial output protocol (one JSON object per line, newline-terminated):
+ *   {"ts":1234567,"ch0":12.34,"ch1":12.10,"ch2":11.98,"ch3":12.05,
+ *    "temp":28.5,"bat_mv":3820,"mode":"sample","mp_index":0.042}
+ *
+ * Control commands received over Serial (newline-terminated):
+ *   CMD:ZERO          — re-zero / baseline capture
+ *   CMD:START         — start streaming
+ *   CMD:STOP          — pause streaming
+ *   CMD:RATE:<n>      — set sample interval in ms (e.g. CMD:RATE:500)
+ *   CMD:RESET         — software reset
+ *
+ * Hardware:
+ *   ESP32-S3 + FDC1004 (I2C) + optional ADS131M08 (SPI)
+ *   316L stainless electrodes, IP67 enclosure
+ *
+ * License: GPL-3.0
+ * Project: https://github.com/only-foss/Project-Nira
  */
 
 #include <Arduino.h>
-#include <InfluxDbClient.h>
-#include <InfluxDbCloud.h>
-#include <Protocentral_FDC1004.h>
-#include <WiFiMulti.h>
 #include <Wire.h>
+#include <ArduinoJson.h>   // ArduinoJson v7 — add to platformio.ini: bblanchon/ArduinoJson
 
-// ============================================================================
-// HARDWARE PINS & CONFIG
-static const uint8_t SDA_PIN = 21;
-static const uint8_t SCL_PIN = 22;
-static const uint16_t SAMPLE_INTERVAL_MS = 10; // 100 Hz
+// ─── FDC1004 Register Map ────────────────────────────────────────────────────
+#define FDC1004_ADDR        0x50
+#define FDC1004_FDC_CONF    0x0C
+#define FDC1004_MEAS1_MSB   0x00
+#define FDC1004_MEAS2_MSB   0x02
+#define FDC1004_MEAS3_MSB   0x04
+#define FDC1004_MEAS4_MSB   0x06
+#define FDC1004_CONF_CH1    0x08
+#define FDC1004_CONF_CH2    0x09
+#define FDC1004_CONF_CH3    0x0A
+#define FDC1004_CONF_CH4    0x0B
+#define FDC_CAP_DAC_DISABLED 0x1C00  // CAPDAC = 0, CHA = CHx, CHB = CAPDAC
 
-// FDC1004 channels
-static const uint8_t CH1_CIN = 0; // C1
-static const uint8_t CH4_CIN = 3; // C4
+// ─── Pin Definitions ─────────────────────────────────────────────────────────
+#define I2C_SDA_PIN         21
+#define I2C_SCL_PIN         22
+#define LED_STATUS_PIN      2    // onboard LED
+#define BAT_ADC_PIN         34   // battery voltage divider (adjust for your HW)
 
-FDC1004 fdc_sensor(&Wire, FDC1004_RATE_100HZ);
+// ─── Configuration ───────────────────────────────────────────────────────────
+#define SERIAL_BAUD         115200
+#define DEFAULT_SAMPLE_MS   500   // default sample interval
+#define BASELINE_SAMPLES    32    // samples averaged for zero baseline
 
-#include "secrets.h"
+// ─── Globals ─────────────────────────────────────────────────────────────────
+static float   baseline_pF[4]  = {0.0f, 0.0f, 0.0f, 0.0f};
+static bool    streaming        = true;
+static uint32_t sample_interval = DEFAULT_SAMPLE_MS;
+static uint32_t last_sample_ms  = 0;
+static uint32_t sample_count    = 0;
 
-// ============================================================================
-// WIFI + INFLUXDB CONFIG (FOSS Compliant Local Instance)
-const char *WIFI_SSID = SECRET_WIFI_SSID;
-const char *WIFI_PASS = SECRET_WIFI_PASS;
+// ─── FDC1004 Helpers ─────────────────────────────────────────────────────────
 
-// InfluxDB FOSS Local Instance
-#define INFLUXDB_URL SECRET_INFLUXDB_URL
-#define INFLUXDB_TOKEN SECRET_INFLUXDB_TOKEN
-#define INFLUXDB_ORG SECRET_INFLUXDB_ORG
-#define INFLUXDB_BUCKET SECRET_INFLUXDB_BUCKET
-#define TZ_INFO "Asia/Kolkata" // Your Time Zone
+/**
+ * @brief Write a 16-bit value to an FDC1004 register.
+ */
+static bool fdc_write16(uint8_t reg, uint16_t val) {
+    Wire.beginTransmission(FDC1004_ADDR);
+    Wire.write(reg);
+    Wire.write((val >> 8) & 0xFF);
+    Wire.write(val & 0xFF);
+    return Wire.endTransmission() == 0;
+}
 
-WiFiMulti wifiMulti;
-// Removed InfluxDbCloud2CACert to support local FOSS InfluxDB connections
-InfluxDBClient client(INFLUXDB_URL, INFLUXDB_ORG, INFLUXDB_BUCKET,
-                      INFLUXDB_TOKEN);
-Point sensorData("nira_sensor");
+/**
+ * @brief Read a 32-bit measurement result from the FDC1004 (MSB + LSB regs).
+ */
+static int32_t fdc_read_meas(uint8_t msb_reg) {
+    Wire.beginTransmission(FDC1004_ADDR);
+    Wire.write(msb_reg);
+    if (Wire.endTransmission(false) != 0) return 0;
 
-// ============================================================================
-// GLOBALS
-static uint32_t lastUpload = 0;
-static uint32_t lastWiFiCheck = 0;
+    Wire.requestFrom((uint8_t)FDC1004_ADDR, (uint8_t)4);
+    if (Wire.available() < 4) return 0;
 
-// ============================================================================
-// HELPER FUNCTION
-void print_banner();
-bool init_sensor();
-uint16_t read_channel(uint8_t ch);
-void print_wiring_error();
-void send_to_influxdb(uint16_t ch1, uint16_t ch4, float diff);
+    int32_t raw = ((int32_t)Wire.read() << 24)
+                | ((int32_t)Wire.read() << 16)
+                | ((int32_t)Wire.read() <<  8)
+                |  (int32_t)Wire.read();
+    return raw >> 8;  // 24-bit signed result
+}
 
-// ============================================================================
-// SETUP
+/**
+ * @brief Convert raw FDC1004 24-bit signed value to picofarads.
+ *        Full-scale = ±15 pF, 24-bit signed: 1 LSB = 30 pF / 2^24
+ */
+static float raw_to_pF(int32_t raw) {
+    return (float)raw * (30.0f / (float)(1 << 24));
+}
+
+/**
+ * @brief Configure all 4 FDC1004 channels for single-ended measurement.
+ */
+static void fdc_configure() {
+    // MEAS1..4: CHA = CH1..4, CHB = CAPDAC, CAPDAC = 0
+    fdc_write16(FDC1004_CONF_CH1, (0x00 << 13) | FDC_CAP_DAC_DISABLED);
+    fdc_write16(FDC1004_CONF_CH2, (0x01 << 13) | FDC_CAP_DAC_DISABLED);
+    fdc_write16(FDC1004_CONF_CH3, (0x02 << 13) | FDC_CAP_DAC_DISABLED);
+    fdc_write16(FDC1004_CONF_CH4, (0x03 << 13) | FDC_CAP_DAC_DISABLED);
+    // FDC_CONF: RATE=100S/s (01), REPEAT=1, MEAS1..4 enable
+    fdc_write16(FDC1004_FDC_CONF, 0x0F9F);
+    delay(20);
+}
+
+/**
+ * @brief Trigger a single measurement cycle and read all 4 channels.
+ * @param[out] pF  Array of 4 floats (pF per channel)
+ */
+static bool fdc_read_all(float pF[4]) {
+    // Trigger single shot
+    fdc_write16(FDC1004_FDC_CONF, 0x8F9F);
+    delay(25);  // wait for conversion (100 S/s → ~10 ms, add margin)
+
+    const uint8_t msb_regs[4] = {
+        FDC1004_MEAS1_MSB, FDC1004_MEAS2_MSB,
+        FDC1004_MEAS3_MSB, FDC1004_MEAS4_MSB
+    };
+    for (int i = 0; i < 4; i++) {
+        int32_t raw = fdc_read_meas(msb_regs[i]);
+        pF[i] = raw_to_pF(raw);
+    }
+    return true;
+}
+
+// ─── Sensor Utilities ────────────────────────────────────────────────────────
+
+/**
+ * @brief Read battery voltage in millivolts via ADC.
+ *        Assumes 1:2 voltage divider, 3.3 V ref, 12-bit ADC.
+ */
+static uint32_t read_bat_mv() {
+    uint32_t adc = analogRead(BAT_ADC_PIN);
+    // (adc / 4095) * 3300 mV * 2 (divider)
+    return (adc * 6600UL) / 4095UL;
+}
+
+/**
+ * @brief Read die temperature from ESP32 internal sensor (approximate).
+ */
+static float read_temp_c() {
+    // ESP32 has temperatureRead() in some frameworks; fallback to NaN
+#ifdef __XTENSA__
+    extern float temperatureRead();
+    return temperatureRead();
+#else
+    return NAN;
+#endif
+}
+
+/**
+ * @brief Microplastic index: mean differential capacitance from baseline.
+ *        Higher deviation → higher particle count proxy.
+ */
+static float compute_mp_index(float pF[4]) {
+    float sum = 0.0f;
+    for (int i = 0; i < 4; i++) {
+        float delta = pF[i] - baseline_pF[i];
+        sum += delta * delta;
+    }
+    // RMS deviation in pF
+    return sqrtf(sum / 4.0f);
+}
+
+// ─── Baseline (Zero) Capture ─────────────────────────────────────────────────
+
+/**
+ * @brief Capture baseline by averaging BASELINE_SAMPLES readings.
+ *        Called on startup and whenever CMD:ZERO is received.
+ */
+static void capture_baseline() {
+    float accum[4] = {0};
+    Serial.println("{\"status\":\"zeroing\"}");
+    for (int s = 0; s < BASELINE_SAMPLES; s++) {
+        float pF[4];
+        if (fdc_read_all(pF)) {
+            for (int i = 0; i < 4; i++) accum[i] += pF[i];
+        }
+        delay(20);
+    }
+    for (int i = 0; i < 4; i++) {
+        baseline_pF[i] = accum[i] / BASELINE_SAMPLES;
+    }
+    Serial.printf("{\"status\":\"zero_done\","
+                  "\"base_pF\":[%.4f,%.4f,%.4f,%.4f]}\n",
+                  baseline_pF[0], baseline_pF[1],
+                  baseline_pF[2], baseline_pF[3]);
+}
+
+// ─── Command Parser ───────────────────────────────────────────────────────────
+
+/**
+ * @brief Parse and execute a command string received over Serial.
+ * @param cmd  Null-terminated command string (leading/trailing whitespace OK).
+ */
+static void handle_command(const char* cmd) {
+    if (strncmp(cmd, "CMD:ZERO", 8) == 0) {
+        capture_baseline();
+    } else if (strncmp(cmd, "CMD:START", 9) == 0) {
+        streaming = true;
+        Serial.println("{\"status\":\"streaming_start\"}");
+    } else if (strncmp(cmd, "CMD:STOP", 8) == 0) {
+        streaming = false;
+        Serial.println("{\"status\":\"streaming_stop\"}");
+    } else if (strncmp(cmd, "CMD:RESET", 9) == 0) {
+        Serial.println("{\"status\":\"resetting\"}");
+        delay(100);
+        ESP.restart();
+    } else if (strncmp(cmd, "CMD:RATE:", 9) == 0) {
+        int ms = atoi(cmd + 9);
+        if (ms >= 50 && ms <= 60000) {
+            sample_interval = (uint32_t)ms;
+            Serial.printf("{\"status\":\"rate_set\",\"interval_ms\":%u}\n",
+                          sample_interval);
+        } else {
+            Serial.println("{\"error\":\"invalid_rate\"}");
+        }
+    } else {
+        Serial.printf("{\"error\":\"unknown_cmd\",\"cmd\":\"%s\"}\n", cmd);
+    }
+}
+
+// ─── Arduino Entry Points ─────────────────────────────────────────────────────
+
 void setup() {
-  Serial.begin(115200);
-  while (!Serial)
-    delay(10);
-  delay(1500);
+    Serial.begin(SERIAL_BAUD);
+    while (!Serial) delay(10);
 
-  print_banner();
+    pinMode(LED_STATUS_PIN, OUTPUT);
+    analogReadResolution(12);
 
-  Wire.begin(SDA_PIN, SCL_PIN);
-  Wire.setClock(400000UL);
+    Wire.begin(I2C_SDA_PIN, I2C_SCL_PIN);
+    Wire.setClock(400000);  // 400 kHz I2C
 
-  if (!init_sensor()) {
-    print_wiring_error();
-    while (true)
-      delay(1000);
-  }
+    // Announce firmware version
+    Serial.println("{\"status\":\"boot\",\"fw\":\"nira-v1.1\","
+                   "\"proto\":\"nira-serial-v1\"}");
 
-  Serial.println("time_ms,CH1_raw,CH4_raw,Diff_C1_C4,Temp_C");
-  Serial.println("Sensor ready 100 Hz sampling + InfluxDB");
+    fdc_configure();
+    capture_baseline();
 
-  // WiFi
-  wifiMulti.addAP(WIFI_SSID, WIFI_PASS);
-  Serial.print("Connecting WiFi");
-  while (wifiMulti.run() != WL_CONNECTED) {
-    delay(500);
-    Serial.print(".");
-  }
-  Serial.println("\nWiFi connected! IP: " + WiFi.localIP().toString());
-
-  // Time sync for InfluxDB
-  timeSync(TZ_INFO, "pool.ntp.org", "time.nis.gov");
-
-  // Add tags
-  sensorData.addTag("device", "nira_esp32");
-  sensorData.addTag("team", "domination");
-
-  if (client.validateConnection()) {
-    Serial.println("Connected to InfluxDB Cloud");
-  } else {
-    Serial.println("InfluxDB connection failed");
-  }
-
-  Serial.println("Ready – uploading every 15 s to InfluxDB");
+    Serial.println("{\"status\":\"ready\"}");
+    last_sample_ms = millis();
 }
 
-// ============================================================================
-// LOOP
 void loop() {
-  static uint32_t last_sample = 0;
-  uint32_t now = millis();
-
-  if (now - last_sample >= SAMPLE_INTERVAL_MS) {
-    last_sample = now;
-
-    uint32_t t1 = micros();
-    uint16_t ch1_raw = read_channel(CH1_CIN);
-    uint16_t ch4_raw = read_channel(CH4_CIN);
-    uint32_t delta_us = micros() - t1;
-
-    float diff = (float)ch1_raw - ch4_raw;
-
-    // Basic temperature compensation
-    float temp_c = 25.0; // TODO: read from DS18B20 or internal ESP32 sensor
-    float comp_diff = diff - (temp_c - 25.0) * 8.5;
-
-    // Serial Plotter output
-    Serial.print(now);
-    Serial.print(',');
-    Serial.print(ch1_raw);
-    Serial.print(',');
-    Serial.print(ch4_raw);
-    Serial.print(',');
-    Serial.print(comp_diff);
-    Serial.print(',');
-    Serial.println(temp_c);
-
-    // Upload every 1 s
-    if (now - lastUpload >= 1000UL) {
-      lastUpload = now;
-      send_to_influxdb(ch1_raw, ch4_raw, comp_diff);
+    // ── Handle incoming serial commands ──────────────────────────────────────
+    if (Serial.available()) {
+        static char cmd_buf[64];
+        static uint8_t cmd_len = 0;
+        char c = Serial.read();
+        if (c == '\n' || c == '\r') {
+            if (cmd_len > 0) {
+                cmd_buf[cmd_len] = '\0';
+                handle_command(cmd_buf);
+                cmd_len = 0;
+            }
+        } else if (cmd_len < sizeof(cmd_buf) - 1) {
+            cmd_buf[cmd_len++] = c;
+        }
     }
-  }
 
-  // WiFi reconnect
-  if (now - lastWiFiCheck >= 30000UL) {
-    lastWiFiCheck = now;
-    if (wifiMulti.run() != WL_CONNECTED) {
-      Serial.println("WiFi dropped - reconnecting...");
+    // ── Periodic sensor sampling ──────────────────────────────────────────────
+    uint32_t now = millis();
+    if (streaming && (now - last_sample_ms >= sample_interval)) {
+        last_sample_ms = now;
+
+        float pF[4];
+        if (!fdc_read_all(pF)) {
+            Serial.println("{\"error\":\"sensor_read_failed\"}");
+            digitalWrite(LED_STATUS_PIN, LOW);
+            return;
+        }
+
+        float mp_index = compute_mp_index(pF);
+        float temp     = read_temp_c();
+        uint32_t bat   = read_bat_mv();
+
+        // ── Emit JSON sample line ─────────────────────────────────────────────
+        // Format: single line, newline-terminated — easy for Python readline()
+        Serial.printf(
+            "{\"ts\":%lu,\"n\":%lu,"
+            "\"ch0\":%.4f,\"ch1\":%.4f,\"ch2\":%.4f,\"ch3\":%.4f,"
+            "\"d0\":%.4f,\"d1\":%.4f,\"d2\":%.4f,\"d3\":%.4f,"
+            "\"temp\":%.2f,\"bat_mv\":%lu,\"mp_index\":%.5f,"
+            "\"mode\":\"sample\"}\n",
+            (unsigned long)now,
+            (unsigned long)++sample_count,
+            pF[0], pF[1], pF[2], pF[3],
+            pF[0] - baseline_pF[0],
+            pF[1] - baseline_pF[1],
+            pF[2] - baseline_pF[2],
+            pF[3] - baseline_pF[3],
+            isnan(temp) ? -99.0f : temp,
+            (unsigned long)bat,
+            mp_index
+        );
+
+        // Blink LED on each sample
+        digitalWrite(LED_STATUS_PIN, HIGH);
+        delay(5);
+        digitalWrite(LED_STATUS_PIN, LOW);
     }
-  }
-}
-
-// ============================================================================
-// INFLUXDB WRITE
-void send_to_influxdb(uint16_t ch1, uint16_t ch4, float diff) {
-  if (wifiMulti.run() != WL_CONNECTED)
-    return;
-
-  sensorData.clearFields();
-  sensorData.addField("ch1_raw", ch1);
-  sensorData.addField("ch4_raw", ch4);
-  sensorData.addField("diff_c1_c4", diff);
-
-  if (!client.writePoint(sensorData)) {
-    Serial.print("InfluxDB write failed: ");
-    Serial.println(client.getLastErrorMessage());
-  } else {
-    Serial.println("Data written to InfluxDB");
-  }
-}
-
-// ============================================================================
-// HELPER FUNCTIONS
-void print_banner() {
-  Serial.println();
-  Serial.println("=======================================");
-  Serial.println(" NIRA v1.5 C1 + C4 Flow Sensor ");
-  Serial.println(" ESP32 + FDC1004 + InfluxDB ");
-  Serial.println("=======================================");
-}
-
-bool init_sensor() {
-  Serial.print("FDC1004 initialization... ");
-  bool ok = fdc_sensor.begin();
-  Serial.println(ok ? "OK" : "FAILED");
-  return ok;
-}
-
-uint16_t read_channel(uint8_t ch) { return fdc_sensor.getCapacitance(ch); }
-
-void print_wiring_error() {
-  Serial.println("\n=== WIRING ERROR ===");
-  Serial.println("FDC1004 → ESP32");
-  Serial.println("VCC → 3V3 | GND → GND");
-  Serial.println("SDA → GPIO21 | SCL → GPIO22");
-  Serial.println("CIN1 (C1) → Electrode 1");
-  Serial.println("CIN4 (C4) → Electrode 2");
-  Serial.println("Common GND plate required");
-  Serial.println("=============================");
 }

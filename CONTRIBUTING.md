@@ -1,68 +1,43 @@
 # Contributing to Project Nira
 
-> Open Hardware Microplastics Detector — [github.com/only-foss/Project-Nira](https://github.com/only-foss/Project-Nira)
+Thank you for helping make water quality monitoring accessible to everyone!
 
-Thank you for your interest in Project Nira. All contributions — hardware, firmware, software, documentation, testing, and translations — are equally valued.
+## Quick Start
 
----
+```bash
+git clone https://github.com/only-foss/Project-Nira.git
+cd Project-Nira
 
-## Ways to Contribute
+# Firmware
+pip install platformio
+pio run                    # build
+pio run --target upload    # flash
+pio device monitor         # serial monitor
 
-### Hardware
-- Improve electrode geometry or materials
-- Design a proper PCB (currently breadboard prototype)
-- Design an IP67 enclosure for field deployment
-- Validate sensor performance with different microplastic types/sizes
+# GUI
+pip install -r requirements.txt
+python software/nira_gui.py
+```
 
-### Firmware
-- Improve FDC1004 sampling rate and averaging
-- Add BLE/WiFi configuration portal
-- Implement on-device threshold detection and alert
+## How to Contribute
 
-### Software & Analysis
-- Improve GNU Octave analysis scripts in `tests/analysis/`
-- Add Python analysis pipeline
-- Implement ML classification of sensor data
+1. Check [Issues](https://github.com/only-foss/Project-Nira/issues) for open tasks
+2. Fork the repo, create a branch: `git checkout -b feat/your-feature`
+3. Make changes following the code style in `.cursorrules`
+4. Add/update tests in `tests/`
+5. Update relevant docs (see `.cursorrules` § Documentation Auto-Update Rules)
+6. Commit using the format in `.cursorrules` § Commit Message Format
+7. Open a Pull Request
 
-### Documentation
-- Translate docs (priority: Hindi, Marathi, Tamil)
-- Add build tutorials with photos
-- Write a field deployment guide
+## Code Style
 
----
+- Firmware (C++): see `.cursorrules` § Firmware Rules
+- GUI (Python): PEP 8, Google docstrings, type hints
+- All code must pass the FOSS compliance checklist in `.cursorrules`
 
-## Workflow
+## License
 
-1. Open a **GitHub Issue or Discussion** describing what you plan to do
-2. Fork the repo and create a branch: `git checkout -b feat/your-feature`
-3. Make focused commits with clear messages
-4. Update documentation as needed
-5. Submit a **Pull Request** with a clear description
-
-### Branch naming
-
-| Type | Format | Example |
-|------|--------|---------|
-| Feature | `feature/description` | `feature/pcb-v2-layout` |
-| Bug fix | `fix/description` | `fix/fdc1004-i2c-timeout` |
-| Documentation | `docs/description` | `docs/hindi-translation` |
-| Hardware | `hw/description` | `hw/enclosure-v1` |
-| Tests | `test/description` | `test/saltwater-validation` |
-
----
-
-## Hardware Contribution Rules
-
-- All hardware must be licensed under **CERN-OHL-P v2**
-- Include KiCad source files — PDFs alone are not sufficient
-- Include `BOM.csv` with supplier, part number, quantity, and reference designator
-- Version hardware as `vX.Y` (e.g. `v1.6`, `v2.0`)
-- Export Gerbers to `hardware/vX.Y/pcb/` for PCB designs
-
----
-
-## Code of Conduct
-
-Be kind. Be constructive. Be collaborative. This project is built for communities that lack access to environmental monitoring — please bring that spirit to all interactions.
-
-Questions? Open a [GitHub Discussion](https://github.com/only-foss/Project-Nira/discussions).
+By contributing, you agree your code will be released under:
+- Firmware/Software: GPL-3.0-or-later
+- Hardware: CERN-OHL-P-2.0
+- Docs: CC-BY-SA-4.0

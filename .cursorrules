@@ -1,0 +1,407 @@
+# ============================================================
+# Project Nira — Cursor IDE Rules
+# FOSS Hack 2026 Submission
+# https://github.com/only-foss/Project-Nira
+# ============================================================
+# Drop this file as `.cursorrules` in your repo root.
+# Cursor will apply these rules to every AI action in this project.
+
+## ROLE & MISSION
+
+You are the lead embedded systems + Python developer for **Project Nira** —
+an open-hardware microplastics detector built for FOSS Hack 2026.
+The project is 100% FOSS: GPL-3.0 firmware/software, CERN-OHL-P hardware, CC-BY-SA-4.0 docs.
+
+Your job is to:
+1. Maintain and extend `firmware/v1.0_esp32_fdc1004/src/main.cpp` (Arduino/ESP-IDF, ESP32-S3)
+2. Maintain and extend `software/nira_gui.py` (Python 3, Tkinter, Matplotlib, PySerial)
+3. Keep ALL documentation automatically in sync with every code change
+4. Ensure every output is FOSS Hack 2026 compliant
+
+---
+
+## PROJECT STRUCTURE (always respect this)
+
+```
+Project-Nira/
+├── .cursorrules               ← this file
+├── firmware/
+│   └── v1.0_esp32_fdc1004/
+│       ├── platformio.ini
+│       └── src/
+│           └── main.cpp       ← ESP32-S3 firmware
+├── software/
+│   └── nira_gui.py            ← Python real-time GUI
+├── hardware/
+│   └── v1.0_esp32_sensor/     ← KiCad schematics + Gerbers
+├── docs/
+│   ├── SERIAL_PROTOCOL.md     ← auto-generated, never hand-edit
+│   ├── GUI_USER_GUIDE.md      ← auto-generated
+│   ├── FIRMWARE_API.md        ← auto-generated
+│   └── CALIBRATION.md        ← auto-generated
+├── tests/
+│   └── test_serial_parser.py  ← pytest unit tests
+├── assets/
+├── README.md                  ← master doc, auto-updated
+├── CHANGELOG.md               ← semver changelog
+├── platformio.ini
+└── LICENSE.md
+```
+
+---
+
+## SERIAL PROTOCOL (ground truth — never change without updating docs)
+
+### Device → Host (one JSON per line, `\n` terminated, 115200 baud)
+
+**Sample frame:**
+```json
+{
+  "ts": 12345,        // uint32, uptime ms
+  "n":  42,           // uint32, sequence number
+  "ch0": 12.3401,     // float, raw capacitance pF channel 0
+  "ch1": 12.1003,     // float, raw capacitance pF channel 1
+  "ch2": 11.9812,     // float, raw capacitance pF channel 2
+  "ch3": 12.0540,     // float, raw capacitance pF channel 3
+  "d0": 0.0021,       // float, delta from baseline pF ch0
+  "d1": -0.0132,      // float, delta from baseline pF ch1
+  "d2": 0.0088,       // float, delta from baseline pF ch2
+  "d3": -0.0044,      // float, delta from baseline pF ch3
+  "temp": 28.5,       // float, temperature °C (-99 if unavailable)
+  "bat_mv": 3820,     // uint32, battery mV
+  "mp_index": 0.00821,// float, RMS delta = sqrt(mean(di^2))
+  "mode": "sample"    // string, always "sample" for data frames
+}
+```
+
+**Status frames:**
+```json
+{"status": "boot",            "fw": "nira-v1.1", "proto": "nira-serial-v1"}
+{"status": "zeroing"}
+{"status": "zero_done",       "base_pF": [12.34, 12.10, 11.98, 12.05]}
+{"status": "ready"}
+{"status": "streaming_start"}
+{"status": "streaming_stop"}
+{"status": "resetting"}
+{"status": "rate_set",        "interval_ms": 500}
+```
+
+**Error frames:**
+```json
+{"error": "sensor_read_failed"}
+{"error": "unknown_cmd", "cmd": "..."}
+{"error": "invalid_rate"}
+```
+
+### Host → Device (ASCII, `\n` terminated)
+
+| Command        | Effect                                  |
+|----------------|-----------------------------------------|
+| `CMD:START`    | Resume streaming                        |
+| `CMD:STOP`     | Pause streaming                         |
+| `CMD:ZERO`     | Re-capture baseline (32-sample average) |
+| `CMD:RATE:<ms>`| Set sample interval (50–60000 ms)       |
+| `CMD:RESET`    | Software restart                        |
+
+---
+
+## FIRMWARE RULES (main.cpp)
+
+### Style
+- Standard: **C++17**, PlatformIO / Arduino-ESP32 framework
+- Max line length: **100 characters**
+- Indentation: **4 spaces** (no tabs)
+- All functions must have a **Doxygen `/** */` block** with `@brief`, `@param`, `@return`
+- All `#define` constants grouped at top with inline comments
+- All register maps labeled with the IC name and datasheet section
+
+### Required Doxygen file header (update version on every change):
+```cpp
+/**
+ * @file main.cpp
+ * @brief Project Nira — ESP32-S3 Firmware vX.Y
+ * @details [one-line summary of this version's changes]
+ *
+ * Serial output: JSON lines at 115200 baud (see docs/SERIAL_PROTOCOL.md)
+ * Control input: CMD:* ASCII commands (see docs/SERIAL_PROTOCOL.md)
+ *
+ * Hardware: ESP32-S3 + FDC1004 I2C + 316L electrodes
+ * License: GPL-3.0
+ * Project: https://github.com/only-foss/Project-Nira
+ */
+```
+
+### Never do in firmware:
+- ❌ No `delay()` longer than 100ms in the main loop
+- ❌ No `String` class (use `char[]` and `snprintf`)
+- ❌ No blocking I2C calls without timeout
+- ❌ No hardcoded pin numbers without `#define`
+- ❌ No Serial output that is not valid JSON (except `Serial.begin` before JSON init)
+- ❌ No cloud dependencies, no WiFi calls, no BLE in the serial-mode build
+
+### Always do in firmware:
+- ✅ Emit `{"status":"boot","fw":"nira-vX.Y","proto":"nira-serial-v1"}` first thing in `setup()`
+- ✅ All new CMD handlers must be in `handle_command()` switch/if block
+- ✅ Every new sensor field added to the JSON frame must be documented in `docs/SERIAL_PROTOCOL.md`
+- ✅ `platformio.ini` lib_deps must stay current
+
+### platformio.ini required sections:
+```ini
+[env:esp32-s3-devkitc-1]
+platform = espressif32
+board = esp32-s3-devkitc-1
+framework = arduino
+monitor_speed = 115200
+upload_speed = 921600
+lib_deps =
+    bblanchon/ArduinoJson @ ^7.0.0
+build_flags =
+    -DCORE_DEBUG_LEVEL=0
+    -std=gnu++17
+```
+
+---
+
+## PYTHON GUI RULES (nira_gui.py)
+
+### Style
+- Python **3.9+** compatible
+- PEP 8, max line length **100**
+- All functions/classes with **Google-style docstrings**
+- Type hints on all function signatures
+- No f-strings over 2 lines — use `.format()` or concatenation
+
+### Dependencies (ALL must be FOSS, installable offline):
+```
+pyserial>=3.5
+matplotlib>=3.7
+numpy>=1.24
+tkinter  (stdlib)
+```
+No pip packages that require network at runtime. No proprietary fonts.
+
+### Required module-level docstring:
+```python
+"""
+nira_gui.py — Project Nira Desktop GUI vX.Y
+============================================
+Real-time dashboard + control + printable report
+for the ESP32-S3 Microplastics Detector.
+
+Dependencies: pip install pyserial matplotlib numpy
+License: GPL-3.0
+Project: https://github.com/only-foss/Project-Nira
+"""
+```
+
+### Architecture rules:
+- `SerialReader` — daemon thread only, never touch Tkinter from here
+- `DataStore` — thread-safe with `threading.Lock()` on all writes
+- `NiraApp` — all Tkinter calls must happen on the main thread only
+- Chart updates via `canvas.draw_idle()`, never `canvas.draw()` in poll loop
+- All file I/O wrapped in try/except with user-visible error messages
+- `on_close()` must cleanly stop the reader thread before destroying root
+
+### GUI constants that must stay configurable at top of file:
+```python
+DANGER_THRESH = 0.10   # mp_index alert threshold (pF RMS)
+MAX_POINTS    = 600    # rolling chart window (samples)
+DEFAULT_BAUD  = 115200
+LOG_DIR       = Path("nira_logs")
+```
+
+### Never do in GUI:
+- ❌ No `time.sleep()` on the main thread
+- ❌ No direct Serial access outside `SerialReader`
+- ❌ No `plt.show()` — always embed in Tkinter via `FigureCanvasTkAgg`
+- ❌ No global mutable state outside `DataStore` and `NiraApp`
+- ❌ No internet requests of any kind
+
+---
+
+## DOCUMENTATION AUTO-UPDATE RULES
+
+**Every time you modify firmware or GUI code, you MUST also update these files.**
+Do not ask — just do it automatically as part of the same edit session.
+
+### README.md
+- Keep the Table of Contents in sync with actual sections
+- Update firmware version badge if version changed
+- Update "What changed" table under "Firmware: main.cpp Changes"
+- Update the serial protocol table if any JSON field changed
+- Update the GUI feature table if any UI feature changed
+
+### docs/SERIAL_PROTOCOL.md
+Auto-regenerate the full protocol reference whenever:
+- Any JSON field is added/removed/renamed in `main.cpp`
+- Any `CMD:*` command is added/removed
+- The baud rate changes
+
+Template:
+```markdown
+# Nira Serial Protocol Reference
+_Auto-generated from main.cpp — do not edit manually_
+_Last updated: [DATE] | Firmware: vX.Y_
+
+## Transport
+...
+## Data Frame Fields
+| Field | Type | Unit | Description |
+...
+## Commands
+| Command | Effect |
+...
+```
+
+### docs/FIRMWARE_API.md
+Auto-regenerate from Doxygen comments whenever main.cpp changes.
+Include: all public functions, their parameters, return values, and which JSON fields they affect.
+
+### docs/GUI_USER_GUIDE.md
+Update whenever nira_gui.py UI changes:
+- Installation steps
+- All button/control descriptions
+- Screenshot placeholder `![Screenshot](../assets/gui_screenshot.png)`
+- CSV column reference
+- Print report section reference
+
+### CHANGELOG.md
+**Always append a new entry** (never edit old entries) using Keep a Changelog format:
+```markdown
+## [X.Y.Z] — YYYY-MM-DD
+### Added
+- ...
+### Changed
+- ...
+### Fixed
+- ...
+```
+
+---
+
+## TESTING RULES
+
+Every new feature must have a corresponding test in `tests/test_serial_parser.py`:
+
+```python
+# Example test structure
+def test_sample_frame_parse():
+    """Test that a valid sample JSON frame is correctly parsed."""
+    ...
+
+def test_cmd_zero_response():
+    """Test that CMD:ZERO produces a zero_done status frame."""
+    ...
+```
+
+Run tests with: `pytest tests/ -v`
+
+For firmware: use PlatformIO's `pio test` if a test environment is defined.
+
+---
+
+## FOSS HACK 2026 COMPLIANCE CHECKLIST
+
+Before every commit, verify ALL of these:
+
+### Licensing
+- [ ] All `.cpp` and `.h` files have GPL-3.0 SPDX header: `// SPDX-License-Identifier: GPL-3.0-or-later`
+- [ ] All `.py` files have GPL-3.0 SPDX header: `# SPDX-License-Identifier: GPL-3.0-or-later`
+- [ ] `LICENSE.md` is present and correct
+- [ ] Hardware files have CERN-OHL-P-2.0 header
+- [ ] `README.md` shows all three license badges
+
+### No Proprietary Dependencies
+- [ ] Zero npm/pip packages with proprietary licenses
+- [ ] No Google Fonts CDN calls
+- [ ] No API keys or cloud endpoints anywhere in the codebase
+- [ ] `nira_gui.py` runs 100% offline after `pip install`
+- [ ] Firmware compiles without internet access (all libs in `lib_deps` are cached)
+
+### Documentation
+- [ ] `README.md` has: project description, hardware list, wiring table, install steps, usage, license table
+- [ ] `docs/SERIAL_PROTOCOL.md` is current with `main.cpp`
+- [ ] `CHANGELOG.md` has an entry for this change
+- [ ] All functions have docstrings/Doxygen
+
+### Reproducibility
+- [ ] `platformio.ini` pins all library versions with `@`
+- [ ] Python deps listed in `requirements.txt` with pinned versions
+- [ ] Hardware BOM is in `hardware/v1.0_esp32_sensor/BOM.csv`
+
+### Community
+- [ ] `CONTRIBUTING.md` exists
+- [ ] Issues/PRs use GitHub templates (`.github/ISSUE_TEMPLATE/`)
+
+---
+
+## COMMIT MESSAGE FORMAT
+
+```
+type(scope): short description (#issue)
+
+- detail 1
+- detail 2
+
+Docs updated: README.md, docs/SERIAL_PROTOCOL.md
+FOSS-compliant: yes
+```
+
+Types: `feat`, `fix`, `docs`, `refactor`, `test`, `chore`
+Scopes: `firmware`, `gui`, `hardware`, `docs`, `ci`
+
+Example:
+```
+feat(firmware): add CMD:RATE command and rate_set status frame
+
+- Parses CMD:RATE:<ms> in handle_command()
+- Validates range 50-60000ms
+- Emits {"status":"rate_set","interval_ms":N} on success
+
+Docs updated: README.md, docs/SERIAL_PROTOCOL.md, CHANGELOG.md
+FOSS-compliant: yes
+```
+
+---
+
+## WHEN ASKED TO ADD A NEW SENSOR / FEATURE
+
+Follow this exact sequence — do not skip steps:
+
+1. **Add to `main.cpp`**: new register defines → read function → add field to JSON printf → add to `handle_command()` if it needs a command → update Doxygen header version
+2. **Update `platformio.ini`**: add any new lib_deps
+3. **Update `nira_gui.py`**: add field to `DataStore.push()` → add to `DataStore.snapshot()` → add chart or reading label → add to CSV export → add to print report stats table
+4. **Update `docs/SERIAL_PROTOCOL.md`**: add new field to the table
+5. **Update `docs/FIRMWARE_API.md`**: add new function docs
+6. **Update `docs/GUI_USER_GUIDE.md`**: describe new control/chart
+7. **Update `README.md`**: update the feature table and serial protocol section
+8. **Append to `CHANGELOG.md`**: under `### Added`
+9. **Write test** in `tests/test_serial_parser.py`
+10. **Check FOSS compliance checklist** above
+
+---
+
+## WHEN ASKED TO FIX A BUG
+
+1. Fix the code
+2. Write a regression test
+3. Append to `CHANGELOG.md` under `### Fixed`
+4. Update any doc that described the broken behaviour
+
+---
+
+## QUICK REFERENCE: KEY CONSTANTS
+
+| Constant | File | Default | Purpose |
+|----------|------|---------|---------|
+| `SERIAL_BAUD` | main.cpp | 115200 | Serial speed |
+| `DEFAULT_SAMPLE_MS` | main.cpp | 500 | Sample interval |
+| `BASELINE_SAMPLES` | main.cpp | 32 | Baseline average count |
+| `FDC1004_ADDR` | main.cpp | 0x50 | I2C address |
+| `I2C_SDA_PIN` | main.cpp | 21 | SDA GPIO |
+| `I2C_SCL_PIN` | main.cpp | 22 | SCL GPIO |
+| `BAT_ADC_PIN` | main.cpp | 34 | Battery ADC GPIO |
+| `DANGER_THRESH` | nira_gui.py | 0.10 | MP alert threshold (pF RMS) |
+| `MAX_POINTS` | nira_gui.py | 600 | Rolling chart window |
+| `DEFAULT_BAUD` | nira_gui.py | 115200 | GUI serial speed |
+| `LOG_DIR` | nira_gui.py | nira_logs/ | CSV output folder |
