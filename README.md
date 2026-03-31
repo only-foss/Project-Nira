@@ -1,43 +1,62 @@
 [![CERN-OHL-P](https://img.shields.io/badge/License-CERN--OHL--P-yellow.svg)](https://cern-ohl.web.cern.ch/)
-![OSHW](https://img.shields.io/badge/OSHW-Compliant-brightgreen)
+[![OSHW](https://img.shields.io/badge/OSHW-Compliant-brightgreen)](https://certification.oshwa.org/)
+[![Python 3.12](https://img.shields.io/badge/Python-3.12-blue.svg)](https://www.python.org/)
 
-# Project-Nira: Open Hardware Microplastics Detector
+# Project Nira: Open Hardware Microplastics Detector
 
+**Project Nira** is an affordable (₹2500), portable impedance-based sensor designed to detect microplastics (<5mm) in water. It serves as a field-ready alternative to expensive lab spectrometers for schools and community groups.
 
+## 🛠️ Quick Start
 
-**Project Nira** creates an affordable (₹2500), portable impedance-based sensor to detect microplastics (<5mm) in water. No ₹10L spectrometers needed. Field-ready for rural schools, communities, citizen scientists.
+### 1. Requirements
+- Python 3.12+
+- `uv` (recommended) or `pip`
+- OS: Linux, macOS, or Windows
 
-**Hardware**: ESP32-S3 + ADS131M08 24-bit ADC + 316L electrodes + IP67 enclosure. **Firmware**: ESP-IDF with BLE/WiFi. **Build**: 90min soldering.
+### 2. Installation
+Run the automated setup for your environment:
 
+```bash
+# Linux/macOS
+./setup.sh
 
+# Windows
+.\setup.bat
+```
 
-## What We're Building
+### 3. Usage
+```bash
+source .venv/bin/activate
+python python/nira_dashboard.py
+```
 
-Project Nira is an **open-hardware initiative** to develop an **affordable and portable system** for detecting **microplastics in water**. Instead of relying on expensive lab equipment, we are exploring **impedance-based sensing** as a low-cost method to detect the presence of microplastic particles.
+## ⚙️ Architecture
+The system uses **electrical impedance spectroscopy** to identify suspended microplastics.
 
+1.  **Hardware**: ESP32-S3 + ADS131M08 (24-bit ADC) + 316L stainless steel electrodes.
+2.  **Firmware**: ESP-IDF handling 1ksps data acquisition with BLE/WiFi streaming.
+3.  **Software**: Python-based pipeline for signal processing and real-time visualization.
 
-## Why This Matters
+## 📁 Repository Structure
+```text
+├── assets/             # Images and branding
+├── firmware/           # ESP32-S3 firmware source
+├── hardware/           # KiCad schematics and CAD files
+├── ml_pipeline/        # Signal analysis and models
+├── python/             # Dashboard and user-facing tools
+├── setup.sh            # Automated Linux setup
+└── setup.bat           # Automated Windows setup
+```
 
-**Microplastics** (particles smaller than 5 mm) are now found in rivers, lakes, groundwater, and even drinking water. However, detecting them usually requires:
+## 🌊 Why This Matters
+Traditional microplastic monitoring is inaccessible due to high equipment costs (₹10L+) and complex sample prep. Project Nira provides a **repairable, modular, and open-source** tool for localized water quality monitoring.
 
-- Advanced spectroscopy machines
-- Lab sample preparation
-- Trained specialists
+## 📄 License
+- **Software**: [MIT License](LICENSE.md#software)
+- **Hardware**: [CC BY-SA 4.0 International](LICENSE.md#hardware)
 
-This makes regular monitoring nearly **impossible** for rural areas, small institutions, and community groups.
-
-
-## Our Approach
-
-Project Nira aims to design a device that is:
-
-- **Low-cost**
-- **Portable**
-- **Built using easily available components**
-- **Repairable and modular**
-- **Fully open-source**
-
-We are currently exploring how changes in **electrical impedance** can indicate the presence of suspended micro-plastic particles in water. The goal is to create a **practical, field-deployable tool** rather than a lab-bound equipment.
+---
+*Built for FOSS Hack 2026 by Tram Dominators.*
 
 
 

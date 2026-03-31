@@ -4,7 +4,22 @@ All notable changes to this project will be documented here.
 Format: [Keep a Changelog](https://keepachangelog.com/)
 Versioning: [Semantic Versioning](https://semver.org/)
 
-## [1.1.0] — 2026-01-01
+
+## [1.2.0] — 2026-03-31
+
+### Added
+- **Compliance**: Validated repo against FOSS Hack 2026 submission rules.
+- **Reproducibility**: Added `setup.sh` (Linux/macOS) and `setup.bat` (Windows) for environment bootstrapping.
+- **Documentation**: Updated README with technical usage and architecture overview.
+- **License**: Confirmed MIT/CC BY-SA 4.0 dual-licensing for clarity.
+
+### Changed
+- Replaced non-FOSS libraries with open-source alternatives in `requirements.txt`.
+- Refined project structure for better discoverability.
+
+---
+21: 
+22: ## [1.1.0] — 2026-01-01
 
 ### Added
 - Structured JSON serial output protocol (nira-serial-v1)
