@@ -1,5 +1,5 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 #!/usr/bin/env python3
+# SPDX-License-Identifier: MIT
 """
 nira_gui.py — Project Nira Desktop GUI
 =======================================
@@ -12,7 +12,7 @@ Dependencies (all FOSS):
 Usage:
     python nira_gui.py [--port /dev/ttyUSB0] [--baud 115200]
 
-License: GPL-3.0
+License: MIT
 Project: https://github.com/only-foss/Project-Nira
 """
 

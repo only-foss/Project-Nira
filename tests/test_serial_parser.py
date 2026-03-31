@@ -1,12 +1,13 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
+# SPDX-License-Identifier: MIT
 """
 tests/test_serial_parser.py
 Unit tests for Project Nira serial protocol parsing logic.
-Run with: pytest tests/ -v
+Run with: python -m unittest -v
 """
 
 import json
 import math
+import unittest
 
 
 # -- Helpers mirroring nira_gui.py DataStore.push() logic ----------------------
@@ -23,7 +24,7 @@ def compute_mp_index(deltas: list[float]) -> float:
 
 # -- Tests ---------------------------------------------------------------------
 
-class TestSampleFrameParsing:
+class TestSampleFrameParsing(unittest.TestCase):
     SAMPLE_LINE = (
         '{"ts":12345,"n":42,'
         '"ch0":12.3401,"ch1":12.1003,"ch2":11.9812,"ch3":12.0540,'
@@ -36,77 +37,81 @@ class TestSampleFrameParsing:
         required = ["ts","n","ch0","ch1","ch2","ch3",
                     "d0","d1","d2","d3","temp","bat_mv","mp_index","mode"]
         for field in required:
-            assert field in obj, f"Missing field: {field}"
+            self.assertIn(field, obj, f"Missing field: {field}")
 
     def test_ts_is_uint(self):
         obj = parse_frame(self.SAMPLE_LINE)
-        assert isinstance(obj["ts"], int)
-        assert obj["ts"] >= 0
+        self.assertIsInstance(obj["ts"], int)
+        self.assertGreaterEqual(obj["ts"], 0)
 
     def test_channel_values_float(self):
         obj = parse_frame(self.SAMPLE_LINE)
         for ch in ["ch0","ch1","ch2","ch3"]:
-            assert isinstance(obj[ch], float)
+            self.assertIsInstance(obj[ch], float)
 
     def test_mp_index_nonnegative(self):
         obj = parse_frame(self.SAMPLE_LINE)
-        assert obj["mp_index"] >= 0.0
+        self.assertGreaterEqual(obj["mp_index"], 0.0)
 
     def test_mp_index_formula(self):
         obj = parse_frame(self.SAMPLE_LINE)
         deltas = [obj[f"d{i}"] for i in range(4)]
         expected = compute_mp_index(deltas)
-        assert abs(obj["mp_index"] - expected) < 1e-4
+        self.assertLess(abs(obj["mp_index"] - expected), 1e-4)
 
     def test_mode_is_sample(self):
         obj = parse_frame(self.SAMPLE_LINE)
-        assert obj["mode"] == "sample"
+        self.assertEqual(obj["mode"], "sample")
 
 
-class TestStatusFrames:
+class TestStatusFrames(unittest.TestCase):
     def test_boot_frame(self):
         line = '{"status":"boot","fw":"nira-v1.1","proto":"nira-serial-v1"}'
         obj = parse_frame(line)
-        assert obj["status"] == "boot"
-        assert "fw" in obj
-        assert "proto" in obj
+        self.assertEqual(obj["status"], "boot")
+        self.assertIn("fw", obj)
+        self.assertIn("proto", obj)
 
     def test_zero_done_frame(self):
         line = '{"status":"zero_done","base_pF":[12.34,12.10,11.98,12.05]}'
         obj = parse_frame(line)
-        assert obj["status"] == "zero_done"
-        assert len(obj["base_pF"]) == 4
+        self.assertEqual(obj["status"], "zero_done")
+        self.assertEqual(len(obj["base_pF"]), 4)
 
     def test_rate_set_frame(self):
         line = '{"status":"rate_set","interval_ms":500}'
         obj = parse_frame(line)
-        assert obj["status"] == "rate_set"
-        assert obj["interval_ms"] == 500
+        self.assertEqual(obj["status"], "rate_set")
+        self.assertEqual(obj["interval_ms"], 500)
 
 
-class TestErrorFrames:
+class TestErrorFrames(unittest.TestCase):
     def test_sensor_error(self):
         line = '{"error":"sensor_read_failed"}'
         obj = parse_frame(line)
-        assert "error" in obj
+        self.assertIn("error", obj)
 
     def test_unknown_cmd_error(self):
         line = '{"error":"unknown_cmd","cmd":"CMD:BLAH"}'
         obj = parse_frame(line)
-        assert obj["error"] == "unknown_cmd"
-        assert "cmd" in obj
+        self.assertEqual(obj["error"], "unknown_cmd")
+        self.assertIn("cmd", obj)
 
 
-class TestMpIndex:
+class TestMpIndex(unittest.TestCase):
     def test_zero_deltas_gives_zero_index(self):
-        assert compute_mp_index([0.0, 0.0, 0.0, 0.0]) == 0.0
+        self.assertEqual(compute_mp_index([0.0, 0.0, 0.0, 0.0]), 0.0)
 
     def test_symmetric_deltas(self):
         idx = compute_mp_index([0.1, -0.1, 0.1, -0.1])
-        assert abs(idx - 0.1) < 1e-9
+        self.assertLess(abs(idx - 0.1), 1e-9)
 
     def test_danger_threshold(self):
         DANGER_THRESH = 0.10
         # Deltas that produce mp_index just above threshold
         deltas = [0.11, 0.11, 0.11, 0.11]
-        assert compute_mp_index(deltas) > DANGER_THRESH
+        self.assertGreater(compute_mp_index(deltas), DANGER_THRESH)
+
+
+if __name__ == "__main__":
+    unittest.main()

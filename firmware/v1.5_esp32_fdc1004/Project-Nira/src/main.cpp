@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: MIT
 /**
  * @file main.cpp
  * @brief Project Nira — ESP32-S3 Firmware v1.1
@@ -21,7 +21,7 @@
  *   ESP32-S3 + FDC1004 (I2C) + optional ADS131M08 (SPI)
  *   316L stainless electrodes, IP67 enclosure
  *
- * License: GPL-3.0
+ * License: MIT
  * Project: https://github.com/only-foss/Project-Nira
  */
 

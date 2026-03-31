@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 #!/usr/bin/env python3
 # SPDX-License-Identifier: MIT
 # Project Nira — Unified Entry Point

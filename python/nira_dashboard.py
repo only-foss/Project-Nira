@@ -1,5 +1,5 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
 #!/usr/bin/env python3
+# SPDX-License-Identifier: MIT
 # SPDX-License-Identifier: MIT
 # Copyright (C) 2026  only-foss
 """

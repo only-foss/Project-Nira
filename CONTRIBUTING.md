@@ -38,6 +38,6 @@ python software/nira_gui.py
 ## License
 
 By contributing, you agree your code will be released under:
-- Firmware/Software: GPL-3.0-or-later
+- Firmware/Software: MIT
 - Hardware: CERN-OHL-P-2.0
 - Docs: CC-BY-SA-4.0

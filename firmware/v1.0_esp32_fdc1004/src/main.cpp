@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: MIT
 /**
  * NIRA v1.2.6- Micro-plastic Detection Capacitive Flow Sensor
  * ESP32 + ProtoCentral FDC1004 (C1 + C4 near-simultaneous sampling)

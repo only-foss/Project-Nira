@@ -10,7 +10,7 @@
 
 You are the lead embedded systems + Python developer for **Project Nira** —
 an open-hardware microplastics detector built for FOSS Hack 2026.
-The project is 100% FOSS: GPL-3.0 firmware/software, CERN-OHL-P hardware, CC-BY-SA-4.0 docs.
+The project is 100% FOSS: MIT firmware/software, CERN-OHL-P hardware, CC-BY-SA-4.0 docs.
 
 Your job is to:
 1. Maintain and extend `firmware/v1.0_esp32_fdc1004/src/main.cpp` (Arduino/ESP-IDF, ESP32-S3)
@@ -126,7 +126,7 @@ Project-Nira/
  * Control input: CMD:* ASCII commands (see docs/SERIAL_PROTOCOL.md)
  *
  * Hardware: ESP32-S3 + FDC1004 I2C + 316L electrodes
- * License: GPL-3.0
+ * License: MIT
  * Project: https://github.com/only-foss/Project-Nira
  */
 ```
@@ -189,7 +189,7 @@ Real-time dashboard + control + printable report
 for the ESP32-S3 Microplastics Detector.
 
 Dependencies: pip install pyserial matplotlib numpy
-License: GPL-3.0
+License: MIT
 Project: https://github.com/only-foss/Project-Nira
 """
 ```
@@ -305,8 +305,8 @@ For firmware: use PlatformIO's `pio test` if a test environment is defined.
 Before every commit, verify ALL of these:
 
 ### Licensing
-- [ ] All `.cpp` and `.h` files have GPL-3.0 SPDX header: `// SPDX-License-Identifier: GPL-3.0-or-later`
-- [ ] All `.py` files have GPL-3.0 SPDX header: `# SPDX-License-Identifier: GPL-3.0-or-later`
+- [ ] All `.cpp` and `.h` files have MIT SPDX header: `// SPDX-License-Identifier: MIT`
+- [ ] All `.py` files have MIT SPDX header: `# SPDX-License-Identifier: MIT`
 - [ ] `LICENSE.md` is present and correct
 - [ ] Hardware files have CERN-OHL-P-2.0 header
 - [ ] `README.md` shows all three license badges
