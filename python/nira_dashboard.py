@@ -105,10 +105,9 @@ def run_gui_mode(default_port, default_baud, default_out):
             self.read_thread = threading.Thread(target=self.serial_read_loop, daemon=True)
             self.read_thread.start()
             
-            # --- NEW / FIXED: Matplotlib Animation with cache_frame_data=False ---
-            self.anim = animation.FuncAnimation(
-                self.fig, self.update_plot, interval=self.update_interval, blit=False, cache_frame_data=False
-            )
+            # # Matplotlib Animation
+            # self.anim = animation.FuncAnimation(self.fig, self.update_plot, interval=100, blit=False)
+            self.anim = animation.FuncAnimation(self.fig, self.update_plot, interval=100, blit=False, cache_frame_data=False)
 
         def build_ui(self):
             # --- NEW / FIXED: Status Bar at Bottom ---
@@ -266,9 +265,7 @@ def run_gui_mode(default_port, default_baud, default_out):
         # --- NEW / FIXED: Safe Parameter updates ---
         def apply_params(self):
             try:
-                # safe defaults to prevent TclError
-                w_val = self.window_slider.get()
-                new_size = int(w_val) if w_val else 512
+                new_size = int(self.window_var.get() or "256")   # or 512, 100, etc.
                 self.max_pts = new_size
                 
                 i_val = self.interval_slider.get()
@@ -479,20 +476,17 @@ def run_gui_mode(default_port, default_baud, default_out):
             self.line_ch4.set_data(t_list, list(self.ch4_data))
             self.line_diff.set_data(t_list, list(self.diff_data))
 
-            # --- NEW / FIXED: Auto Scaling runs safely every few frames ---
-            # using modulo on frame integer if possible, else just every draw call
-            if getattr(self, "idx", 0) > 0 and (isinstance(frame, int) and frame % 5 == 0):
-                try:
-                    self.ax1.relim()
-                    self.ax1.autoscale_view(True, True, True)
-                    self.ax1.margins(y=0.15)
-                    self.ax2.relim()
-                    self.ax2.autoscale_view(True, True, True)
-                    self.ax2.margins(y=0.15)
-                except Exception:
-                    pass
-            return self.line_ch1, self.line_ch4, self.line_diff
 
+            self.ax1.plot(self.t_data, self.ch1_data, color='blue', alpha=0.7)
+            self.ax1.plot(self.t_data, self.ch4_data, color='orange', alpha=0.7)
+            
+            self.ax2.plot(self.t_data, self.diff_data, color='purple')
+            self.ax2.axhline(0, color='gray', linestyle='--', alpha=0.5)
+        # === AUTO SCALING FIX - Add this block ===
+        if hasattr(self, 'ax') and len(self.x_data) > 5:   # Only after some data arrives
+            self.ax.relim()                  # Re-calculate data limits
+            self.ax.autoscale_view(True, True, True)  # Auto scale X and Y
+            self.fig.canvas.draw_idle()      # Force redraw
     app = NiraDashboard()
     app.mainloop()
 

@@ -8,4 +8,6 @@ project_nira.egg-info/requires.txt
 project_nira.egg-info/top_level.txt
 python/__init__.py
 python/nira_dashboard.py
+python/nira_gui.py
 python/nira_reader.py
+tests/test_serial_parser.py
