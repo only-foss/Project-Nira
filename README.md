@@ -1,53 +1,43 @@
-# Project Nira
+[![CERN-OHL-P](https://img.shields.io/badge/License-CERN--OHL--P-yellow.svg)](https://cern-ohl.web.cern.ch/)
+![OSHW](https://img.shields.io/badge/OSHW-Compliant-brightgreen)
 
-**Microplastics Detection Ecosystem**
+# Project-Nira: Open Hardware Microplastics Detector
 
-Project Nira is an open-source, affordable (~$30 USD) IoT hardware and software stack designed to detect microplastics in water using capacitance-based differential sensing.
 
-## 1. Quick Start Installation
 
-Set up the entire project effortlessly on your machine. This installs Python 3.12, dependencies, sets up a virtual environment, and handles system packages automatically.
+**Project Nira** creates an affordable (₹2500), portable impedance-based sensor to detect microplastics (<5mm) in water. No ₹10L spectrometers needed. Field-ready for rural schools, communities, citizen scientists.
 
-### Linux / macOS
-Open a terminal in the project folder and run:
-```bash
-chmod +x setup.sh
-./setup.sh
-```
+**Hardware**: ESP32-S3 + ADS131M08 24-bit ADC + 316L electrodes + IP67 enclosure. **Firmware**: ESP-IDF with BLE/WiFi. **Build**: 90min soldering.
 
-### Windows
-Double-click `setup.bat` or run in Command Prompt:
-```cmd
-setup.bat
-```
 
-## 2. Running the Dashboard
-Once the setup completes, activate your environment and launch the live telemetry dashboard.
 
-**Linux / macOS:**
-```bash
-source .venv/bin/activate
-python python/nira_dashboard.py
-```
+## What We're Building
 
-**Windows:**
-```cmd
-.venv\Scripts\activate
-python python\nira_dashboard.py
-```
+Project Nira is an **open-hardware initiative** to develop an **affordable and portable system** for detecting **microplastics in water**. Instead of relying on expensive lab equipment, we are exploring **impedance-based sensing** as a low-cost method to detect the presence of microplastic particles.
 
-## 3. Directory Structure
-- `firmware/`: ESP32 Edge-device C++ scripts
-- `hardware/`: KiCad PCB designs and schematics
-- `python/`: Dashboard UI and Machine Learning tools
-- `tests/`: Empirical validation and logs
-- `docs/`: Expanded architectural specifications
 
-## 4. Troubleshooting
-- **Cannot Connect to Port (Permission Denied)**: On Linux, ensure you are in the dialout group by running `sudo usermod -aG dialout $USER`. Log out and back in to apply.
-- **`tkinter` Import Error**: Wait, the setup script installs `python3-tk`! If it missed it, run `sudo apt install python3-tk` manually.
-- **Port not appearing**: Verify the ESP32 is plugged in with a data-sync USB cable.
+## Why This Matters
 
-## 5. License
-- **Hardware**: CERN-OHL-P v2
-- **Software**: MIT
+**Microplastics** (particles smaller than 5 mm) are now found in rivers, lakes, groundwater, and even drinking water. However, detecting them usually requires:
+
+- Advanced spectroscopy machines
+- Lab sample preparation
+- Trained specialists
+
+This makes regular monitoring nearly **impossible** for rural areas, small institutions, and community groups.
+
+
+## Our Approach
+
+Project Nira aims to design a device that is:
+
+- **Low-cost**
+- **Portable**
+- **Built using easily available components**
+- **Repairable and modular**
+- **Fully open-source**
+
+We are currently exploring how changes in **electrical impedance** can indicate the presence of suspended micro-plastic particles in water. The goal is to create a **practical, field-deployable tool** rather than a lab-bound equipment.
+
+
+
